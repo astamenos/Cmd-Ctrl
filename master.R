@@ -41,11 +41,7 @@ domestic_terms <- c(
 )
 
 # Sourcing helper functions
-source('utils.R')
-
-# Sourcing data processing script
-source('data_processing.R')
-
-# Sourcing analysis script
-source('spatiotemp_mark_LGCP.R')
+source('00_utils.R')
+source('01_data.R')
+source('02_model.R')
 
