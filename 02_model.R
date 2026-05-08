@@ -1226,4 +1226,19 @@ posterior_intensity(samples_comb = samples_comb, model_summary = model_summary)
 
 ggsave('plots/posterior_mean.png', width = 12, height = 10, dpi = 300)
 
+# ----- Save LGCP artifact for dashboard -----
+dir.create('output', showWarnings = FALSE)
+saveRDS(
+  list(
+    samples_comb    = samples_comb,
+    ips_sf          = ips_sf,
+    model_summary   = model_summary,
+    p_int           = p_int,
+    p_mark          = p_mark,
+    n_years         = n_years,
+    covariates_int  = c("intercept", "dist_water"),
+    covariates_mark = c("intercept", "dist_water", "domestic_flag")
+  ),
+  file = 'output/lgcp_posterior.rds'
+)
 
