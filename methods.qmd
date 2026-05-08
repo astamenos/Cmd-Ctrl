@@ -1,0 +1,54 @@
+---
+title: "Methods"
+---
+
+## Model
+
+This analysis fits a **marked Log Gaussian Cox Process (LGCP)** to aggravated assault point patterns in Minneapolis, 2020–2022, using the [NIMBLE](https://r-nimble.org) probabilistic programming framework.
+
+### Intensity process
+
+Let $s_i$ denote the location of event $i$. The intensity $\lambda(s)$ follows:
+
+$$\log \lambda(s,t) = \mathbf{x}(s)^\top \boldsymbol{\beta} + \log \rho(s) + W(s) + \delta_{1,t}$$
+
+where $\mathbf{x}(s)$ are fixed-effect covariates (intercept, distance to water), $\rho(s)$ is a population density offset, $W(s)$ is a zero-mean Gaussian process spatial random effect, and $\delta_{1,t}$ is a year random effect.
+
+### Mark process
+
+Each event carries a binary mark $Y_i \in \{0,1\}$ (domestic / non-domestic). Given the event location:
+
+$$\text{logit}\,P(Y_i = 1 \mid s_i) = \mathbf{z}(s_i)^\top \boldsymbol{\gamma} + \delta_{2,t}$$
+
+where $\mathbf{z}(s_i)$ includes intercept, distance to water, and a smoothed domestic-call-type flag.
+
+### Gaussian process
+
+The GP uses a low-rank approximation with $n_K$ adaptive knots (denser in high-crime areas) and exponential covariance $C(d) = \sigma^2 \exp(-\phi \, d)$. The range parameter $\phi$ is estimated via empirical variogram on the raw point pattern. The non-centered parameterization $W^\star = L\mathbf{z},\; \mathbf{z} \sim N(0,I)$ (where $L$ is the Cholesky factor of the knot covariance) improves MCMC mixing.
+
+### MCMC
+
+- **Chains:** 3 parallel chains via R `parallel`
+- **Iterations:** 150,000 total; 75,000 burn-in; thinning = 10
+- **Posterior samples:** 7,500 per chain
+- **Convergence:** Gelman-Rubin $\hat{R}$ on $\boldsymbol{\beta}$, $\boldsymbol{\gamma}$, year REs, variance components
+
+## Data Sources
+
+| Source | Variable | Access |
+|--------|----------|--------|
+| [Minneapolis Open Data — Crime](https://opendata.minneapolismn.gov) | Aggravated assaults 2020–2022 | ArcGIS FeatureServer API |
+| [US Census ACS 2019](https://www.census.gov/programs-surveys/acs.html) | Population density, poverty rate | `tidycensus` |
+| [TIGER/Line](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) | Water bodies, roads | `tigris` |
+| [OpenStreetMap](https://www.openstreetmap.org) | Police station locations | `osmdata` |
+| Minneapolis Neighborhoods shapefile | Study boundary | Checked into repository |
+
+## Coordinate System
+
+All spatial objects are projected to UTM Zone 15N (`EPSG:32615`) then scaled to **kilometres** for NIMBLE. KDE bandwidths and GP range parameters are expressed in km.
+
+## Code
+
+Source code: [github.com/apostolos-stamenos/DomesticAbuseLGCP](https://github.com/apostolos-stamenos/DomesticAbuseLGCP)
+
+*Update the URL above to match the actual repository path.*
