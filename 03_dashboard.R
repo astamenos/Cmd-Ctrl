@@ -83,3 +83,42 @@ kde_crime_raster <- function(crime_df, window, sigma_km = 0.5,
   terra::values(r) <- as.vector(t(mat_flipped))
   terra::project(r, "EPSG:4326")
 }
+
+# ── Posterior parameter table ─────────────────────────────────────────────────
+# Returns a gt table of posterior summaries for beta, gamma, sigma, tau.
+# Parameter labels must stay in sync with covariates_int / covariates_mark
+# stored in the RDS (see Task 1 contract).
+
+format_posterior_table <- function(samples_comb, p_int, p_mark) {
+  params <- c(
+    paste0("beta[",  seq_len(p_int),  "]"),
+    paste0("gamma[", seq_len(p_mark), "]"),
+    "sigma", "tau[1]", "tau[2]"
+  )
+  labels <- c(
+    "Intercept (intensity)", "Dist. water — intensity",
+    "Intercept (mark)",      "Dist. water — mark", "Domestic flag — mark",
+    "GP amplitude σ",        "Year RE precision τ₁", "Year RE precision τ₂"
+  )
+
+  purrr::map_dfr(params, function(p) {
+    s <- samples_comb[, p]
+    tibble::tibble(
+      Parameter = p,
+      Mean      = mean(s),
+      SD        = sd(s),
+      `2.5%`    = unname(quantile(s, 0.025)),
+      Median    = median(s),
+      `97.5%`   = unname(quantile(s, 0.975))
+    )
+  }) |>
+    dplyr::mutate(Label = labels) |>
+    dplyr::select(Label, Parameter, Mean, SD, `2.5%`, Median, `97.5%`) |>
+    gt::gt() |>
+    gt::fmt_number(columns = c(Mean, SD, `2.5%`, Median, `97.5%`), decimals = 3) |>
+    gt::cols_label(Label = "Parameter", Parameter = "NIMBLE name") |>
+    gt::tab_style(
+      style = gt::cell_text(weight = "bold"),
+      locations = gt::cells_column_labels()
+    )
+}

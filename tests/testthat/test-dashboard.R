@@ -94,3 +94,15 @@ test_that("kde_crime_raster domestic-only has fewer non-NA cells than all", {
   expect_lte(sum(!is.na(terra::values(r_dom))),
              sum(!is.na(terra::values(r_all))))
 })
+
+# ── format_posterior_table ────────────────────────────────────────────────────
+
+test_that("format_posterior_table returns gt table with correct rows", {
+  skip_if_not(file.exists("output/lgcp_posterior.rds"))
+  post <- load_lgcp_posterior("output/lgcp_posterior.rds")
+  tbl  <- format_posterior_table(post$samples_comb, post$p_int, post$p_mark)
+  expect_s3_class(tbl, "gt_tbl")
+  # p_int + p_mark + 3 variance components (sigma, tau[1], tau[2])
+  n_expected <- post$p_int + post$p_mark + 3L
+  expect_equal(nrow(tbl$`_data`), n_expected)
+})
