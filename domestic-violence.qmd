@@ -1,0 +1,62 @@
+---
+title: "Understanding Domestic Violence"
+---
+
+:::{.callout-warning}
+**If you are in immediate danger, call 911.**
+National DV Hotline: **1-800-799-7233** (24/7, confidential)
+:::
+
+## What Is Domestic Violence?
+
+Domestic violence is a pattern of behavior used by one partner to maintain power and control over another in an intimate relationship. It encompasses physical, emotional, psychological, sexual, and financial abuse.
+
+Contrary to common perception, domestic violence is not confined to low-income communities or any single demographic. It affects people across all income levels, ethnicities, ages, and genders.
+
+## Warning Signs
+
+**In a partner's behavior:**
+- Extreme jealousy or possessiveness
+- Controlling finances, movements, or social relationships
+- Humiliation, belittling, or public embarrassment
+- Threats of harm to you, children, or pets
+- Minimizing or denying abusive behavior
+
+**Physical indicators:**
+- Unexplained bruises or injuries
+- Injuries inconsistent with offered explanations
+- A partner who insists on accompanying to medical appointments
+
+## Cycle of Violence
+
+Research documents a recurring pattern in many abusive relationships:
+
+1. **Tension building** — stress accumulates, survivor "walks on eggshells"
+2. **Incident** — explosion of abusive behavior
+3. **Reconciliation** — apologies, promises to change, honeymoon period
+4. **Calm** — incident minimized or forgotten
+
+This cycle can repeat many times and typically escalates in severity over time.
+
+## Getting Help
+
+| Resource | Contact | Notes |
+|----------|---------|-------|
+| National DV Hotline | 1-800-799-7233 | 24/7, TTY: 1-800-787-3224 |
+| Crisis Text Line | Text START to 88788 | 24/7 text support |
+| MN Day One Crisis Line | 1-866-223-1111 | Minnesota-specific |
+| Minneapolis Domestic Abuse Project | (612) 874-7063 | Legal advocacy + shelter |
+| Cornerstone Advocacy Service | (952) 884-0376 | Hennepin County |
+
+## Why Study DV Spatially?
+
+Spatial analysis of domestic assault calls can help:
+- **Allocate resources** — identify neighborhoods where intervention programs have highest marginal impact
+- **Evaluate policy** — measure whether interventions shift the intensity surface over time
+- **Understand context** — examine how population density, infrastructure, and socioeconomic factors correlate with assault risk
+
+This site presents one such analysis for Minneapolis, 2020–2022, using a Bayesian marked Log Gaussian Cox Process.
+
+---
+
+*The statistics on this site represent reported aggravated assault records. Domestic violence is systemically underreported; true prevalence is substantially higher.*
