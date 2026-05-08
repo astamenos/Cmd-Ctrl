@@ -1,0 +1,41 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Minneapolis Domestic Assault Analysis"
+  favicon: "assets/favicon.ico"
+  navbar:
+    background: "#0f1117"
+    foreground: "#e8eaf6"
+    left:
+      - text: "Overview"
+        file: index.qmd
+      - text: "Hotspots"
+        file: hotspots.qmd
+      - text: "Model Results"
+        file: lgcp-results.qmd
+      - text: "Resources"
+        file: domestic-violence.qmd
+      - text: "Methods"
+        file: methods.qmd
+  page-footer:
+    left: "Data: Minneapolis Open Data · Model: Bayesian LGCP (NIMBLE)"
+    right: "Updated nightly via GitHub Actions"
+
+format:
+  html:
+    theme:
+      dark: [darkly, styles.css]
+    toc: false
+    code-fold: true
+    df-print: paged
+    fig-width: 9
+    fig-height: 6
+    html-math-method: katex
+
+execute:
+  freeze: false
+  echo: false
+  warning: false
+  message: false

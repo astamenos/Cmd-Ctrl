@@ -1,0 +1,57 @@
+/* Base palette */
+:root {
+  --bg-deep:    #0a0c12;
+  --bg-surface: #131720;
+  --bg-card:    #1c2233;
+  --accent-1:   #4f8ef7;   /* primary blue */
+  --accent-2:   #e05c68;   /* domestic-violence red */
+  --text-hi:    #f0f2ff;
+  --text-lo:    #8892a4;
+  --border:     #2a3147;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-hi);
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+/* Cards / value boxes */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* Section headings — brightness hierarchy */
+h1 { color: var(--text-hi); font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+h2 { color: #c8d0e8; font-size: 1.4rem; font-weight: 600; }
+h3 { color: var(--text-lo); font-size: 1.1rem; font-weight: 500; }
+
+/* Accent dividers */
+h2::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  background: var(--accent-1);
+  margin-top: 0.35rem;
+}
+
+/* gt table overrides */
+.gt_table { background: var(--bg-card) !important; color: var(--text-hi) !important; }
+.gt_col_heading { background: var(--bg-surface) !important; color: var(--accent-1) !important; font-weight: 600 !important; }
+.gt_row { border-color: var(--border) !important; }
+
+/* Leaflet container */
+.leaflet-container { border-radius: 8px; }
+
+/* Alert / callout */
+.callout-note { background: var(--bg-card); border-left: 3px solid var(--accent-1); }
+.callout-warning { background: var(--bg-card); border-left: 3px solid var(--accent-2); }
