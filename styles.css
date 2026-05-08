@@ -1,3 +1,5 @@
+/*-- scss:defaults --*/
+
 /* Base palette */
 :root {
   --bg-deep:    #0a0c12;
@@ -9,6 +11,8 @@
   --text-lo:    #8892a4;
   --border:     #2a3147;
 }
+
+/*-- scss:rules --*/
 
 body {
   background-color: var(--bg-deep);

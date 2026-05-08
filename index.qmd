@@ -1,0 +1,61 @@
+---
+title: "Minneapolis Domestic Assault"
+subtitle: "Bayesian spatiotemporal analysis · 2020–2022"
+---
+
+```{r setup}
+source("03_dashboard.R")
+crime <- load_crime_data("data/MPLS_crime.csv")
+trend <- compute_annual_trend(crime)
+```
+
+## At a Glance
+
+```{r value-boxes}
+#| layout-ncol: 3
+total_events  <- nrow(crime)
+pct_dom       <- round(100 * mean(crime$Y == 1), 1)
+years_covered <- paste(range(crime$year), collapse = "–")
+
+bslib::value_box(
+  title = "Total assault records",
+  value = scales::comma(total_events),
+  theme = bslib::value_box_theme(bg = "#1c2233", fg = "#4f8ef7")
+)
+bslib::value_box(
+  title = "Domestic share",
+  value = paste0(pct_dom, "%"),
+  theme = bslib::value_box_theme(bg = "#1c2233", fg = "#e05c68")
+)
+bslib::value_box(
+  title = "Years",
+  value = years_covered,
+  theme = bslib::value_box_theme(bg = "#1c2233", fg = "#8892a4")
+)
+```
+
+## Annual Trend
+
+```{r trend-chart}
+#| fig-height: 4
+p <- trend |>
+  plotly::plot_ly(
+    x = ~year, y = ~n, color = ~Offense,
+    colors = c("Domestic" = "#e05c68", "Non-Domestic" = "#4f8ef7"),
+    type = "scatter", mode = "lines+markers",
+    line = list(width = 2), marker = list(size = 7)
+  ) |>
+  plotly::layout(
+    paper_bgcolor = "#131720", plot_bgcolor = "#131720",
+    font  = list(color = "#e8eaf6"),
+    xaxis = list(title = "Year",   gridcolor = "#2a3147"),
+    yaxis = list(title = "Events", gridcolor = "#2a3147"),
+    legend = list(orientation = "h", y = -0.15)
+  )
+p
+```
+
+:::{.callout-note}
+Data refreshed nightly from the [Minneapolis Open Data portal](https://opendata.minneapolismn.gov).
+LGCP model results are pre-computed; see **Model Results** for details.
+:::
