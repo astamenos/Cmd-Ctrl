@@ -1,0 +1,69 @@
+---
+title: "Crime Hotspots"
+---
+
+```{r setup}
+source("03_dashboard.R")
+crime <- load_crime_data("data/MPLS_crime.csv")
+
+# Convert UTM km → WGS84 for leaflet
+crime_wgs84 <- crime |>
+  dplyr::mutate(x_m = x * 1000, y_m = y * 1000) |>
+  sf::st_as_sf(coords = c("x_m", "y_m"),
+               crs = "+proj=utm +zone=15 +datum=WGS84") |>
+  sf::st_transform(crs = 4326) |>
+  dplyr::mutate(
+    lng = sf::st_coordinates(geometry)[, 1],
+    lat = sf::st_coordinates(geometry)[, 2]
+  ) |>
+  sf::st_drop_geometry()
+
+make_heatmap <- function(df_year) {
+  dom     <- dplyr::filter(df_year, Offense == "Domestic")
+  nondom  <- dplyr::filter(df_year, Offense == "Non-Domestic")
+  leaflet::leaflet() |>
+    leaflet::addProviderTiles("CartoDB.DarkMatter") |>
+    leaflet.extras::addHeatmap(
+      data = dom, lng = ~lng, lat = ~lat,
+      group = "Domestic",
+      blur = 25, max = 0.08, radius = 18,
+      gradient = c("#4f0012", "#e05c68", "#ffcdd2")
+    ) |>
+    leaflet.extras::addHeatmap(
+      data = nondom, lng = ~lng, lat = ~lat,
+      group = "Non-Domestic",
+      blur = 25, max = 0.08, radius = 18,
+      gradient = c("#001a3a", "#4f8ef7", "#bbdefb")
+    ) |>
+    leaflet::addLayersControl(
+      overlayGroups = c("Domestic", "Non-Domestic"),
+      options = leaflet::layersControlOptions(collapsed = FALSE)
+    )
+}
+```
+
+## Assault Density by Year
+
+::: {.panel-tabset}
+
+### 2020
+
+```{r map-2020}
+make_heatmap(dplyr::filter(crime_wgs84, year == "2020"))
+```
+
+### 2021
+
+```{r map-2021}
+make_heatmap(dplyr::filter(crime_wgs84, year == "2021"))
+```
+
+### 2022
+
+```{r map-2022}
+make_heatmap(dplyr::filter(crime_wgs84, year == "2022"))
+```
+
+:::
+
+> Toggle layers with the control panel. Red = domestic assault; blue = non-domestic aggravated assault.
