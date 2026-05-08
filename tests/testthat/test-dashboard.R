@@ -61,3 +61,36 @@ test_that("load_lgcp_posterior samples_comb has expected beta/gamma columns", {
   expect_true("gamma[1]" %in% cols)
   expect_true("gamma[3]" %in% cols)
 })
+
+# ── kde_crime_raster ──────────────────────────────────────────────────────────
+
+test_that("kde_crime_raster returns a SpatRaster in WGS84", {
+  df    <- load_crime_data("data/MPLS_crime.csv")
+  mpls  <- sf::st_read(here::here("data/Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp"),
+                       quiet = TRUE) |>
+    sf::st_transform("+proj=utm +zone=15 +datum=WGS84") |>
+    dplyr::mutate(geometry = geometry / 1000) |>
+    sf::st_set_crs("+proj=utm +zone=15 +datum=WGS84") |>
+    sf::st_union()
+  win   <- spatstat.geom::as.owin(mpls)
+  r     <- kde_crime_raster(df, win, sigma_km = 0.5, offense = "all")
+  expect_s4_class(r, "SpatRaster")
+  expect_equal(as.character(terra::crs(r, describe = TRUE)$authority),
+               "EPSG")
+  expect_equal(terra::crs(r, describe = TRUE)$code, "4326")
+})
+
+test_that("kde_crime_raster domestic-only has fewer non-NA cells than all", {
+  df   <- load_crime_data("data/MPLS_crime.csv") |> dplyr::filter(year == "2021")
+  mpls <- sf::st_read(here::here("data/Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp"),
+                      quiet = TRUE) |>
+    sf::st_transform("+proj=utm +zone=15 +datum=WGS84") |>
+    dplyr::mutate(geometry = geometry / 1000) |>
+    sf::st_set_crs("+proj=utm +zone=15 +datum=WGS84") |>
+    sf::st_union()
+  win  <- spatstat.geom::as.owin(mpls)
+  r_all <- kde_crime_raster(df, win, sigma_km = 0.5, offense = "all")
+  r_dom <- kde_crime_raster(df, win, sigma_km = 0.5, offense = "domestic")
+  expect_lte(sum(!is.na(terra::values(r_dom))),
+             sum(!is.na(terra::values(r_all))))
+})
