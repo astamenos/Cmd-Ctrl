@@ -1,0 +1,57 @@
+---
+title: "Model Results"
+subtitle: "Bayesian marked LGCP · NIMBLE"
+---
+
+```{r setup}
+source("03_dashboard.R")
+posterior_available <- file.exists("output/lgcp_posterior.rds")
+if (posterior_available) {
+  post <- load_lgcp_posterior("output/lgcp_posterior.rds")
+}
+intensity_png <- "plots/posterior_mean.png"
+```
+
+## Posterior Intensity Surface
+
+```{r intensity-map}
+if (file.exists(intensity_png)) {
+  knitr::include_graphics(intensity_png)
+} else {
+  cat("> Intensity surface not yet generated. Run `source('master.R')` to produce it.")
+}
+```
+
+The figure shows posterior mean assault intensity (events/km²) for domestic (left) and non-domestic (right) assaults across 2020–2022. Brighter areas indicate higher model-estimated risk after accounting for population density and the spatial Gaussian process.
+
+## Parameter Estimates
+
+```{r param-table}
+if (posterior_available) {
+  format_posterior_table(post$samples_comb, post$p_int, post$p_mark)
+} else {
+  bslib::card(
+    bslib::card_header("Model artifact unavailable"),
+    bslib::card_body(
+      "Run `source('master.R')` (requires ≈ 2 hours on 3-core parallel) to generate
+       `output/lgcp_posterior.rds`. The MCMC is run separately and not part of the
+       nightly data refresh."
+    )
+  )
+}
+```
+
+## Model Configuration
+
+```{r model-summary}
+if (posterior_available) {
+  post$model_summary |>
+    dplyr::select(metric, value) |>
+    gt::gt() |>
+    gt::fmt_integer(columns = value,
+                    rows = post$model_summary$type == "int") |>
+    gt::fmt_number(columns = value, decimals = 2,
+                   rows = post$model_summary$type == "num") |>
+    gt::cols_label(metric = "Configuration", value = "Value")
+}
+```
