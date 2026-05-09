@@ -37,6 +37,7 @@ jobs:
             any::tidyverse
             any::sf
             any::terra
+            any::spatstat
             any::spatstat.geom
             any::spatstat.explore
             any::leaflet
