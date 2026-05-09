@@ -1,6 +1,11 @@
 project:
   type: website
   output-dir: _site
+  render:
+    - "*.qmd"
+    - "*.md"
+    - "!design/"
+    - "!data/"
 
 website:
   title: "Minneapolis Domestic Assault Analysis"

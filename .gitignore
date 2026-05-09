@@ -52,5 +52,8 @@ rsconnect/
 output/
 _site/
 
+# Internal planning docs
+design/
+
 /.quarto/
 **/*.quarto_ipynb
