@@ -49,6 +49,7 @@ jobs:
             any::tigris
             any::osmdata
             any::spdep
+            any::lme4
             any::nimble
             any::FNN
             any::gstat
