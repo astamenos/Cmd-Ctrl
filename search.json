@@ -1,0 +1,142 @@
+[
+  {
+    "objectID": "methods.html",
+    "href": "methods.html",
+    "title": "Methods",
+    "section": "",
+    "text": "This analysis fits a marked Log Gaussian Cox Process (LGCP) to aggravated assault point patterns in Minneapolis, 2020–2022, using the NIMBLE probabilistic programming framework.\n\n\nLet s_i denote the location of event i. The intensity \\lambda(s) follows:\n\\log \\lambda(s,t) = \\mathbf{x}(s)^\\top \\boldsymbol{\\beta} + \\log \\rho(s) + W(s) + \\delta_{1,t}\nwhere \\mathbf{x}(s) are fixed-effect covariates (intercept, distance to water), \\rho(s) is a population density offset, W(s) is a zero-mean Gaussian process spatial random effect, and \\delta_{1,t} is a year random effect.\n\n\n\nEach event carries a binary mark Y_i \\in \\{0,1\\} (domestic / non-domestic). Given the event location:\n\\text{logit}\\,P(Y_i = 1 \\mid s_i) = \\mathbf{z}(s_i)^\\top \\boldsymbol{\\gamma} + \\delta_{2,t}\nwhere \\mathbf{z}(s_i) includes intercept, distance to water, and a smoothed domestic-call-type flag.\n\n\n\nThe GP uses a low-rank approximation with n_K adaptive knots (denser in high-crime areas) and exponential covariance C(d) = \\sigma^2 \\exp(-\\phi \\, d). The range parameter \\phi is estimated via empirical variogram on the raw point pattern. The non-centered parameterization W^\\star = L\\mathbf{z},\\; \\mathbf{z} \\sim N(0,I) (where L is the Cholesky factor of the knot covariance) improves MCMC mixing.\n\n\n\n\nChains: 3 parallel chains via R parallel\nIterations: 150,000 total; 75,000 burn-in; thinning = 10\nPosterior samples: 7,500 per chain\nConvergence: Gelman-Rubin \\hat{R} on \\boldsymbol{\\beta}, \\boldsymbol{\\gamma}, year REs, variance components"
+  },
+  {
+    "objectID": "methods.html#model",
+    "href": "methods.html#model",
+    "title": "Methods",
+    "section": "",
+    "text": "This analysis fits a marked Log Gaussian Cox Process (LGCP) to aggravated assault point patterns in Minneapolis, 2020–2022, using the NIMBLE probabilistic programming framework.\n\n\nLet s_i denote the location of event i. The intensity \\lambda(s) follows:\n\\log \\lambda(s,t) = \\mathbf{x}(s)^\\top \\boldsymbol{\\beta} + \\log \\rho(s) + W(s) + \\delta_{1,t}\nwhere \\mathbf{x}(s) are fixed-effect covariates (intercept, distance to water), \\rho(s) is a population density offset, W(s) is a zero-mean Gaussian process spatial random effect, and \\delta_{1,t} is a year random effect.\n\n\n\nEach event carries a binary mark Y_i \\in \\{0,1\\} (domestic / non-domestic). Given the event location:\n\\text{logit}\\,P(Y_i = 1 \\mid s_i) = \\mathbf{z}(s_i)^\\top \\boldsymbol{\\gamma} + \\delta_{2,t}\nwhere \\mathbf{z}(s_i) includes intercept, distance to water, and a smoothed domestic-call-type flag.\n\n\n\nThe GP uses a low-rank approximation with n_K adaptive knots (denser in high-crime areas) and exponential covariance C(d) = \\sigma^2 \\exp(-\\phi \\, d). The range parameter \\phi is estimated via empirical variogram on the raw point pattern. The non-centered parameterization W^\\star = L\\mathbf{z},\\; \\mathbf{z} \\sim N(0,I) (where L is the Cholesky factor of the knot covariance) improves MCMC mixing.\n\n\n\n\nChains: 3 parallel chains via R parallel\nIterations: 150,000 total; 75,000 burn-in; thinning = 10\nPosterior samples: 7,500 per chain\nConvergence: Gelman-Rubin \\hat{R} on \\boldsymbol{\\beta}, \\boldsymbol{\\gamma}, year REs, variance components"
+  },
+  {
+    "objectID": "methods.html#data-sources",
+    "href": "methods.html#data-sources",
+    "title": "Methods",
+    "section": "Data Sources",
+    "text": "Data Sources\n\n\n\nSource\nVariable\nAccess\n\n\n\n\nMinneapolis Open Data — Crime\nAggravated assaults 2020–2022\nArcGIS FeatureServer API\n\n\nUS Census ACS 2019\nPopulation density, poverty rate\ntidycensus\n\n\nTIGER/Line\nWater bodies, roads\ntigris\n\n\nOpenStreetMap\nPolice station locations\nosmdata\n\n\nMinneapolis Neighborhoods shapefile\nStudy boundary\nChecked into repository"
+  },
+  {
+    "objectID": "methods.html#coordinate-system",
+    "href": "methods.html#coordinate-system",
+    "title": "Methods",
+    "section": "Coordinate System",
+    "text": "Coordinate System\nAll spatial objects are projected to UTM Zone 15N (EPSG:32615) then scaled to kilometres for NIMBLE. KDE bandwidths and GP range parameters are expressed in km."
+  },
+  {
+    "objectID": "methods.html#code",
+    "href": "methods.html#code",
+    "title": "Methods",
+    "section": "Code",
+    "text": "Code\nSource code: github.com/apostolos-stamenos/DomesticAbuseLGCP\nUpdate the URL above to match the actual repository path."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Minneapolis Domestic Assault",
+    "section": "",
+    "text": "Total assault records\n20,898\n\n\n\n\n\n\n\n\n\nDomestic share\n13.1%\n\n\n\n\n\n\n\n\n\nYears\n2020–2022"
+  },
+  {
+    "objectID": "index.html#at-a-glance",
+    "href": "index.html#at-a-glance",
+    "title": "Minneapolis Domestic Assault",
+    "section": "",
+    "text": "Total assault records\n20,898\n\n\n\n\n\n\n\n\n\nDomestic share\n13.1%\n\n\n\n\n\n\n\n\n\nYears\n2020–2022"
+  },
+  {
+    "objectID": "index.html#annual-trend",
+    "href": "index.html#annual-trend",
+    "title": "Minneapolis Domestic Assault",
+    "section": "Annual Trend",
+    "text": "Annual Trend\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nData refreshed nightly from the Minneapolis Open Data portal. LGCP model results are pre-computed; see Model Results for details."
+  },
+  {
+    "objectID": "domestic-violence.html",
+    "href": "domestic-violence.html",
+    "title": "Understanding Domestic Violence",
+    "section": "",
+    "text": "Warning\n\n\n\nIf you are in immediate danger, call 911. National DV Hotline: 1-800-799-7233 (24/7, confidential)"
+  },
+  {
+    "objectID": "domestic-violence.html#what-is-domestic-violence",
+    "href": "domestic-violence.html#what-is-domestic-violence",
+    "title": "Understanding Domestic Violence",
+    "section": "What Is Domestic Violence?",
+    "text": "What Is Domestic Violence?\nDomestic violence is a pattern of behavior used by one partner to maintain power and control over another in an intimate relationship. It encompasses physical, emotional, psychological, sexual, and financial abuse.\nContrary to common perception, domestic violence is not confined to low-income communities or any single demographic. It affects people across all income levels, ethnicities, ages, and genders."
+  },
+  {
+    "objectID": "domestic-violence.html#warning-signs",
+    "href": "domestic-violence.html#warning-signs",
+    "title": "Understanding Domestic Violence",
+    "section": "Warning Signs",
+    "text": "Warning Signs\nIn a partner’s behavior: - Extreme jealousy or possessiveness - Controlling finances, movements, or social relationships - Humiliation, belittling, or public embarrassment - Threats of harm to you, children, or pets - Minimizing or denying abusive behavior\nPhysical indicators: - Unexplained bruises or injuries - Injuries inconsistent with offered explanations - A partner who insists on accompanying to medical appointments"
+  },
+  {
+    "objectID": "domestic-violence.html#cycle-of-violence",
+    "href": "domestic-violence.html#cycle-of-violence",
+    "title": "Understanding Domestic Violence",
+    "section": "Cycle of Violence",
+    "text": "Cycle of Violence\nResearch documents a recurring pattern in many abusive relationships:\n\nTension building — stress accumulates, survivor “walks on eggshells”\nIncident — explosion of abusive behavior\nReconciliation — apologies, promises to change, honeymoon period\nCalm — incident minimized or forgotten\n\nThis cycle can repeat many times and typically escalates in severity over time."
+  },
+  {
+    "objectID": "domestic-violence.html#getting-help",
+    "href": "domestic-violence.html#getting-help",
+    "title": "Understanding Domestic Violence",
+    "section": "Getting Help",
+    "text": "Getting Help\n\n\n\n\n\n\n\n\nResource\nContact\nNotes\n\n\n\n\nNational DV Hotline\n1-800-799-7233\n24/7, TTY: 1-800-787-3224\n\n\nCrisis Text Line\nText START to 88788\n24/7 text support\n\n\nMN Day One Crisis Line\n1-866-223-1111\nMinnesota-specific\n\n\nMinneapolis Domestic Abuse Project\n(612) 874-7063\nLegal advocacy + shelter\n\n\nCornerstone Advocacy Service\n(952) 884-0376\nHennepin County"
+  },
+  {
+    "objectID": "domestic-violence.html#why-study-dv-spatially",
+    "href": "domestic-violence.html#why-study-dv-spatially",
+    "title": "Understanding Domestic Violence",
+    "section": "Why Study DV Spatially?",
+    "text": "Why Study DV Spatially?\nSpatial analysis of domestic assault calls can help: - Allocate resources — identify neighborhoods where intervention programs have highest marginal impact - Evaluate policy — measure whether interventions shift the intensity surface over time - Understand context — examine how population density, infrastructure, and socioeconomic factors correlate with assault risk\nThis site presents one such analysis for Minneapolis, 2020–2022, using a Bayesian marked Log Gaussian Cox Process.\n\nThe statistics on this site represent reported aggravated assault records. Domestic violence is systemically underreported; true prevalence is substantially higher."
+  },
+  {
+    "objectID": "hotspots.html",
+    "href": "hotspots.html",
+    "title": "Crime Hotspots",
+    "section": "",
+    "text": "202020212022\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nToggle layers with the control panel. Red = domestic assault; blue = non-domestic aggravated assault."
+  },
+  {
+    "objectID": "hotspots.html#assault-density-by-year",
+    "href": "hotspots.html#assault-density-by-year",
+    "title": "Crime Hotspots",
+    "section": "",
+    "text": "202020212022\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nToggle layers with the control panel. Red = domestic assault; blue = non-domestic aggravated assault."
+  },
+  {
+    "objectID": "lgcp-results.html",
+    "href": "lgcp-results.html",
+    "title": "Model Results",
+    "section": "",
+    "text": "The figure shows posterior mean assault intensity (events/km²) for domestic (left) and non-domestic (right) assaults across 2020–2022. Brighter areas indicate higher model-estimated risk after accounting for population density and the spatial Gaussian process."
+  },
+  {
+    "objectID": "lgcp-results.html#posterior-intensity-surface",
+    "href": "lgcp-results.html#posterior-intensity-surface",
+    "title": "Model Results",
+    "section": "",
+    "text": "The figure shows posterior mean assault intensity (events/km²) for domestic (left) and non-domestic (right) assaults across 2020–2022. Brighter areas indicate higher model-estimated risk after accounting for population density and the spatial Gaussian process."
+  },
+  {
+    "objectID": "lgcp-results.html#parameter-estimates",
+    "href": "lgcp-results.html#parameter-estimates",
+    "title": "Model Results",
+    "section": "Parameter Estimates",
+    "text": "Parameter Estimates\n\n\n\nModel artifact unavailable\nRun `source('master.R')` (requires ≈ 2 hours on 3-core parallel) to generate\n       `output/lgcp_posterior.rds`. The MCMC is run separately and not part of the\n       nightly data refresh."
+  },
+  {
+    "objectID": "lgcp-results.html#model-configuration",
+    "href": "lgcp-results.html#model-configuration",
+    "title": "Model Results",
+    "section": "Model Configuration",
+    "text": "Model Configuration"
+  }
+]
