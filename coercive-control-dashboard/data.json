@@ -1,7 +1,9 @@
 {
   "meta": {
-    "version": "1.0",
+    "version": "2.0.0",
     "updated": "2026-05-22",
+    "last_verified_default": "2026-05-22",
+    "methodology_url": "/policy.html#methodology",
     "sources": [
       "RCFP Reporter's Recording Guide",
       "NCSL State Wiretapping Laws",
@@ -1082,5 +1084,207 @@
         }
       }
     ]
+  },
+  "federal": {
+    "workplace": [
+      {
+        "statute": "Title VII of the Civil Rights Act",
+        "citation": "42 U.S.C. § 2000e",
+        "agency": "EEOC",
+        "filing_deadline_days": 180,
+        "extended_deadline_days": 300,
+        "extended_deadline_note": "300 days in states with a Fair Employment Practices Agency (FEPA)",
+        "scope": "Prohibits employment discrimination based on sex. Workplace harassment and hostile work environment created by coercive tactics may give rise to a Title VII claim.",
+        "url": "https://www.eeoc.gov/statutes/title-vii-civil-rights-act-1964",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "Americans with Disabilities Act",
+        "citation": "42 U.S.C. § 12101",
+        "agency": "EEOC",
+        "filing_deadline_days": 180,
+        "extended_deadline_days": 300,
+        "extended_deadline_note": "300 days in FEPA states",
+        "scope": "PTSD and other trauma-related conditions may constitute a covered disability. Employers must provide reasonable accommodation and may not retaliate for accommodation requests.",
+        "url": "https://www.eeoc.gov/statutes/americans-disabilities-act-1990",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "Family and Medical Leave Act",
+        "citation": "29 U.S.C. § 2601",
+        "agency": "DOL Wage and Hour Division",
+        "filing_deadline_days": null,
+        "scope": "Entitles eligible employees to 12 weeks of unpaid leave for a serious health condition. Applies to employers with 50+ employees. Retaliation for exercising FMLA rights is prohibited.",
+        "url": "https://www.dol.gov/agencies/whd/fmla",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "National Labor Relations Act § 7",
+        "citation": "29 U.S.C. § 157",
+        "agency": "NLRB",
+        "filing_deadline_days": 180,
+        "scope": "Protects concerted activity and collective action by employees. Applies even without a union. Employer retaliation for organizing or collective complaint is an unfair labor practice.",
+        "url": "https://www.nlrb.gov/guidance/key-reference-materials/national-labor-relations-act",
+        "last_verified": "2026-05-22"
+      }
+    ],
+    "whistleblower": [
+      {
+        "statute": "Sarbanes-Oxley Act § 806",
+        "citation": "18 U.S.C. § 1514A",
+        "agency": "OSHA / DOL",
+        "filing_deadline_days": 180,
+        "scope": "Protects employees of publicly traded companies who report mail, wire, bank, or securities fraud. Covers reports to federal agencies, Congress, or supervisors. Remedies include reinstatement, back pay, and attorney fees.",
+        "url": "https://www.whistleblowers.gov/statutes/sox",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "Dodd-Frank Act § 922",
+        "citation": "15 U.S.C. § 78u-6",
+        "agency": "SEC Office of the Whistleblower",
+        "filing_deadline_days": null,
+        "scope": "Provides financial awards (10–30% of sanctions over $1M) and anti-retaliation protections for reporting securities violations to the SEC. No filing deadline for the retaliation claim under some circuits.",
+        "url": "https://www.sec.gov/whistleblower",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "False Claims Act",
+        "citation": "31 U.S.C. § 3730",
+        "agency": "DOJ",
+        "filing_deadline_days": null,
+        "scope": "Qui tam provision allows individuals to file suit on behalf of the government for fraud against federal programs. Whistleblowers can receive 15–30% of recovered funds. Anti-retaliation provision at § 3730(h).",
+        "url": "https://www.justice.gov/civil/false-claims-act",
+        "last_verified": "2026-05-22"
+      },
+      {
+        "statute": "OSHA Section 11(c)",
+        "citation": "29 U.S.C. § 660(c)",
+        "agency": "OSHA",
+        "filing_deadline_days": 30,
+        "scope": "Prohibits employer retaliation against workers who report workplace safety violations to OSHA. Strict 30-day filing window from the retaliatory act.",
+        "url": "https://www.whistleblowers.gov/statutes/osha",
+        "last_verified": "2026-05-22"
+      }
+    ]
+  },
+  "resources_national": [
+    {
+      "id": "ndvh",
+      "name": "National Domestic Violence Hotline",
+      "type": "crisis",
+      "phone": "1-800-799-7233",
+      "text": "Text START to 88788",
+      "chat_url": "https://www.thehotline.org/",
+      "populations": ["general", "lgbtq", "immigration"],
+      "languages": ["en", "es", "100+"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "nnedv",
+      "name": "National Network to End Domestic Violence",
+      "type": "advocacy",
+      "url": "https://nnedv.org",
+      "populations": ["general"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "cas",
+      "name": "Coalition Against Stalkerware",
+      "type": "digital",
+      "url": "https://stopstalkerware.org",
+      "populations": ["general"],
+      "languages": ["en", "es", "de", "fr", "it", "pt"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "eff",
+      "name": "Electronic Frontier Foundation — Surveillance Self-Defense",
+      "type": "digital",
+      "url": "https://ssd.eff.org",
+      "populations": ["general", "immigration", "lgbtq"],
+      "languages": ["en", "ar", "fa", "ru", "th", "ur", "zh"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "vera",
+      "name": "Vera Institute of Justice",
+      "type": "policy",
+      "url": "https://vera.org",
+      "populations": ["general"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "womenslaw",
+      "name": "WomensLaw.org",
+      "type": "legal",
+      "url": "https://www.womenslaw.org",
+      "populations": ["general", "immigration", "lgbtq"],
+      "languages": ["en", "es"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "glaad-api",
+      "name": "GLAAD — LGBTQ+ DV Resources",
+      "type": "legal",
+      "url": "https://www.glaad.org/resources/legal",
+      "populations": ["lgbtq"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "futures",
+      "name": "Futures Without Violence",
+      "type": "advocacy",
+      "url": "https://www.futureswithoutviolence.org",
+      "populations": ["general", "workplace"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "nwlc",
+      "name": "National Women's Law Center",
+      "type": "legal",
+      "url": "https://nwlc.org",
+      "populations": ["general", "workplace"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "gao-whistleblower",
+      "name": "Government Accountability Project",
+      "type": "whistleblower",
+      "url": "https://whistleblower.org",
+      "populations": ["workplace"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    },
+    {
+      "id": "nwc",
+      "name": "National Whistleblower Center",
+      "type": "whistleblower",
+      "url": "https://www.whistleblowers.org",
+      "populations": ["workplace"],
+      "languages": ["en"],
+      "scope": "national",
+      "last_verified": "2026-05-22"
+    }
+  ],
+  "survey_results": {
+    "published": false,
+    "n": 0,
+    "aggregate_url": null,
+    "note": "Aggregate results will be published at policy.html#survey-results once N ≥ 30. No sub-group breakdowns that could re-identify small populations."
   }
 }

@@ -1,641 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Understanding Coercive Control — Academy</title>
-<style>
-:root {
-  --base:       #0d1524;
-  --surface-1:  #131f32;
-  --surface-2:  #1a2b44;
-  --surface-3:  #243452;
-  --gold:       #c9a84c;
-  --text-1:     #eef2f7;
-  --text-2:     #7a90aa;
-  --text-3:     #4e637a;
-  --one-party:  #5b9cf6;
-  --all-party:  #e8a93a;
-  --criminal:   #52b788;
-  --civil:      #c9a84c;
-  --none-stat:  #c0635a;
-  --shadow-1:   0 1px 4px rgba(0,0,0,.4);
-  --shadow-2:   0 4px 16px rgba(0,0,0,.5);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%}
-body{
-  min-height:100%;
-  background:var(--base);
-  color:var(--text-1);
-  font-family:system-ui,-apple-system,sans-serif;
-  font-size:15px;
-  line-height:1.55;
-  padding-bottom:80px;
-}
-/* Header */
-.app-header{background:var(--surface-1);border-bottom:1px solid var(--surface-3);padding:2.25rem 2rem 1.75rem}
-.header-inner{max-width:1200px;margin:0 auto}
-.header-source{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
-.header-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,4vw,34px);font-weight:normal;color:var(--text-1);line-height:1.2;margin-bottom:.4rem}
-.header-subtitle{color:var(--text-2);font-size:14px}
-/* Layout */
-.app-layout{display:flex;max-width:1200px;margin:0 auto}
-/* Sidebar */
-.sidebar{width:210px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--surface-3);padding:2rem 0;position:sticky;top:0;height:fit-content}
-.nav-item{display:flex;align-items:flex-start;gap:.75rem;padding:.875rem 1.5rem;cursor:pointer;border-left:2px solid transparent;transition:background .15s,border-color .15s;user-select:none}
-.nav-item:hover{background:var(--surface-2)}
-.nav-item.active{border-left-color:var(--gold);background:var(--surface-2)}
-.nav-item:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-.nav-num{font-family:Georgia,serif;font-size:12px;color:var(--gold);line-height:1.65;flex-shrink:0}
-.nav-label{font-size:13px;color:var(--text-2);line-height:1.65}
-.nav-item.active .nav-label{color:var(--text-1)}
-/* Main */
-.main-content{flex:1;padding:2.5rem 2.5rem 2rem;min-width:0}
-.section-panel{display:none}
-.section-panel.active{display:block}
-/* Lead stat */
-.lead-stat{display:flex;align-items:flex-start;gap:1.5rem;margin-bottom:2.25rem;padding:1.75rem 2rem;background:var(--surface-1);border-radius:4px;box-shadow:var(--shadow-1);border-left:3px solid var(--gold)}
-.lead-stat-number{font-family:Georgia,serif;font-size:clamp(40px,7vw,64px);color:var(--gold);line-height:1;flex-shrink:0}
-.lead-stat-body{padding-top:.4rem}
-.lead-stat-headline{font-size:15px;color:var(--text-1);margin-bottom:.25rem}
-.lead-stat-sub{font-size:13px;color:var(--text-2);line-height:1.6}
-/* Exhibit */
-.exhibit{margin-bottom:2.25rem;background:var(--surface-1);border-radius:4px;box-shadow:var(--shadow-1);overflow:hidden}
-.exhibit-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--surface-3)}
-.exhibit-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold)}
-.exhibit-title{font-size:13px;color:var(--text-2)}
-.exhibit-body{padding:1.25rem}
-.exhibit-footer{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.25rem;border-top:1px solid var(--surface-3);flex-wrap:wrap;gap:.5rem}
-.exhibit-legend{display:flex;gap:1.125rem;align-items:center;flex-wrap:wrap}
-.legend-item{display:flex;align-items:center;gap:.375rem;font-size:11px;color:var(--text-2)}
-.legend-sep{color:var(--text-3);font-size:11px}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
-.dot-one-party{background:var(--one-party)}
-.dot-all-party{background:var(--all-party)}
-.dot-criminal{background:var(--criminal)}
-.dot-civil{background:var(--civil)}
-.dot-none{background:var(--none-stat)}
-.exhibit-source{font-size:11px;color:var(--text-3)}
-/* State grid */
-.state-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.state-cell{background:var(--surface-2);border-radius:3px;padding:.5rem .375rem .4rem;cursor:pointer;transition:background .12s,transform .1s,box-shadow .1s;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid transparent}
-.state-cell:hover{background:var(--surface-3);transform:translateY(-1px);box-shadow:var(--shadow-1)}
-.state-cell.selected{border-color:var(--gold);background:var(--surface-3);box-shadow:var(--shadow-2)}
-.state-cell:focus-visible{outline:2px solid var(--gold)}
-.state-abbr{font-size:11px;font-weight:600;color:var(--text-1);text-align:center}
-.state-dots{display:flex;gap:3px;align-items:center}
-/* Detail panel */
-.detail-panel{background:var(--surface-2);border-radius:4px;box-shadow:var(--shadow-2);padding:1.5rem;margin-top:.75rem;border-left:3px solid var(--gold);animation:slide-in .18s ease-out}
-@keyframes slide-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.detail-state-name{font-family:Georgia,serif;font-size:20px;color:var(--text-1);margin-bottom:.25rem}
-.detail-tier-badge{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:.2em .6em;border-radius:2px;margin-bottom:1.25rem;font-weight:600}
-.tier-badge-one-party{background:rgba(91,156,246,.15);color:var(--one-party)}
-.tier-badge-all-party{background:rgba(232,169,58,.15);color:var(--all-party)}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.detail-section-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
-.detail-statute{font-family:'Courier New',monospace;font-size:13px;color:var(--text-2);margin-bottom:.5rem}
-.detail-body{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:.5rem}
-.detail-practical{font-size:13px;color:var(--text-1);background:var(--surface-3);padding:.75rem 1rem;border-radius:3px;line-height:1.55}
-.detail-note-small{font-size:12px;color:var(--text-3);margin-bottom:.5rem;line-height:1.5}
-.detail-cc-badge{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:.2em .6em;border-radius:2px;font-weight:600;margin-bottom:.5rem}
-.cc-criminal{background:rgba(82,183,136,.15);color:var(--criminal)}
-.cc-civil{background:rgba(201,168,76,.15);color:var(--civil)}
-.cc-none{background:rgba(192,99,90,.15);color:var(--none-stat)}
-/* Checklist */
-.checklist-intro{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:2rem;padding:1.25rem 1.5rem;background:var(--surface-1);border-radius:4px;border-left:3px solid var(--surface-3)}
-.checklist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2rem}
-.dimension-card{background:var(--surface-1);border-radius:4px;box-shadow:var(--shadow-1);overflow:hidden}
-.dimension-header{padding:.875rem 1.125rem .75rem;border-bottom:1px solid var(--surface-3)}
-.dimension-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-.dimension-body{padding:.75rem 1.125rem}
-.check-item{display:flex;align-items:flex-start;gap:.625rem;padding:.5rem 0;border-bottom:1px solid var(--surface-3)}
-.check-item:last-child{border-bottom:none}
-.check-item input[type=checkbox]{margin-top:2px;flex-shrink:0;width:14px;height:14px;accent-color:var(--gold);cursor:pointer}
-.check-item label{font-size:13px;color:var(--text-2);line-height:1.5;cursor:pointer}
-.check-item:has(input:checked) label{color:var(--text-1)}
-/* Result cards */
-.results-section{display:none}
-.results-section.visible{display:block}
-.results-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
-.result-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.result-card{background:var(--surface-2);border-radius:4px;padding:1.25rem;box-shadow:var(--shadow-1);border-top:2px solid var(--gold);display:none}
-.result-card.visible{display:block;animation:slide-in .15s ease-out}
-.result-pattern{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
-.result-description{font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:1rem}
-.result-resources-label{font-size:11px;color:var(--text-3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.08em}
-.result-resource-link{display:block;font-size:13px;color:var(--gold);text-decoration:none;padding:.25rem 0}
-.result-resource-link:hover{text-decoration:underline}
-/* Resource directory */
-.resource-intro{font-size:14px;color:var(--text-2);line-height:1.65;margin-bottom:1.5rem}
-.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.filter-chip{font-size:12px;padding:.375em .875em;border-radius:2px;cursor:pointer;background:var(--surface-2);color:var(--text-2);border:1px solid var(--surface-3);transition:background .12s,color .12s;user-select:none}
-.filter-chip:hover{background:var(--surface-3);color:var(--text-1)}
-.filter-chip.active{background:var(--gold);color:var(--base);border-color:var(--gold);font-weight:600}
-.filter-chip:focus-visible{outline:2px solid var(--gold)}
-.resource-table-wrap{overflow-x:auto}
-.resource-table{width:100%;border-collapse:collapse;font-size:13px}
-.resource-table th{text-align:left;padding:.625rem 1rem;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--surface-3);background:var(--surface-1);white-space:nowrap}
-.resource-table td{padding:.875rem 1rem;color:var(--text-2);border-bottom:1px solid var(--surface-3);vertical-align:top}
-.resource-table tr:nth-child(odd) td{background:var(--surface-1)}
-.resource-table tr:nth-child(even) td{background:var(--base)}
-.resource-org{font-weight:600;color:var(--text-1)}
-.type-badge{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:.2em .55em;border-radius:2px;font-weight:600;white-space:nowrap}
-.type-crisis{background:rgba(192,99,90,.15);color:#e87c74}
-.type-digital-safety{background:rgba(91,156,246,.15);color:var(--one-party)}
-.type-legal{background:rgba(82,183,136,.15);color:var(--criminal)}
-.type-documentation{background:rgba(201,168,76,.15);color:var(--gold)}
-.type-therapy{background:rgba(138,100,210,.15);color:#a87cde}
-.resource-contact{font-family:'Courier New',monospace;font-size:12px;color:var(--text-2)}
-/* Footer */
-.footer-disclaimer{position:fixed;bottom:0;left:0;right:0;background:rgba(13,21,36,.97);backdrop-filter:blur(8px);border-top:1px solid var(--surface-3);padding:.75rem 2rem;font-size:12px;color:var(--text-3);text-align:center;z-index:100}
-.footer-disclaimer strong{color:var(--text-2)}
-.footer-disclaimer a{color:var(--gold);text-decoration:none}
-.footer-disclaimer a:hover{text-decoration:underline}
-/* Responsive */
-@media(max-width:960px){
-  .app-layout{flex-direction:column}
-  .sidebar{width:100%;display:flex;flex-direction:row;padding:0;border-right:none;border-bottom:1px solid var(--surface-3);position:static;overflow-x:auto}
-  .nav-item{flex-direction:column;align-items:center;padding:.75rem 1.25rem;border-left:none;border-bottom:2px solid transparent;white-space:nowrap;gap:.25rem}
-  .nav-item.active{border-bottom-color:var(--gold);border-left-color:transparent}
-  .main-content{padding:1.5rem}
-  .checklist-grid{grid-template-columns:1fr}
-  .result-cards{grid-template-columns:1fr}
-  .detail-grid{grid-template-columns:1fr}
-}
-@media(max-width:700px){
-  .state-grid{grid-template-columns:repeat(4,1fr)}
-}
-@media(max-width:480px){
-  .state-grid{grid-template-columns:repeat(3,1fr)}
-  .lead-stat{flex-direction:column;gap:.75rem}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Understanding Coercive Control — Academy</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-void);
+    }
+    .gate-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem 5rem;
+    }
+    .gate-inner { width: 100%; max-width: 900px; }
+
+    .masthead { margin-bottom: 3rem; }
+    .masthead-series {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold-mid);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .masthead-series::before,
+    .masthead-series::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-gold);
+    }
+    .masthead-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 7vw, 68px);
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--text-1);
+      margin-bottom: 1rem;
+    }
+    .masthead-sub {
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+    .masthead-rule {
+      margin-top: 2rem;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      margin-top: 2rem;
+      border: 1px solid var(--border);
+    }
+    .role-card {
+      display: block;
+      background: var(--bg-base);
+      padding: 2rem 2rem 1.75rem;
+      text-decoration: none;
+      position: relative;
+      transition: background .16s;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+    .role-card:hover { background: var(--bg-surface); border-left-color: var(--gold-mid); }
+    .role-card:focus-visible { outline: 2px solid var(--gold-mid); outline-offset: -2px; }
+    .role-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      letter-spacing: .1em;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.75rem;
+    }
+    .role-card:hover .role-num { color: var(--gold-dim); }
+    .role-icon { font-size: 20px; margin-bottom: .875rem; opacity: .45; }
+    .role-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-1);
+      margin-bottom: .625rem;
+      line-height: 1.2;
+    }
+    .role-desc {
+      font-size: 13px;
+      color: var(--text-3);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .role-card:hover .role-desc { color: var(--text-2); }
+    .role-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: .375rem;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: var(--gold-mid);
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity .14s, transform .14s;
+    }
+    .role-card:hover .role-cta,
+    .role-card:focus-visible .role-cta { opacity: 1; transform: translateX(0); }
+
+    .role-card--survivor { border-top: 2px solid var(--none-border); }
+    .role-card--survivor:hover { border-left-color: var(--none-fg); }
+    .role-card--survivor:hover .role-cta { color: var(--none-fg); }
+    .role-card--survivor .role-title { color: var(--none-fg); }
+
+    .gate-footer {
+      margin-top: 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+    .survey-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      text-decoration: none;
+      letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      transition: color .12s;
+    }
+    .survey-link:hover { color: var(--gold-mid); }
+    .privacy-notice {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      letter-spacing: .06em;
+    }
+    .site-foot {
+      padding: 1.25rem 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-4);
+      text-align: center;
+    }
+    .site-foot a { color: var(--text-3); text-decoration: none; }
+    .site-foot a:hover { color: var(--gold-mid); }
+
+    @media (max-width: 640px) {
+      .role-grid { grid-template-columns: 1fr; }
+      .gate-wrap { align-items: flex-start; padding-top: 2rem; }
+    }
+  </style>
 </head>
 <body>
+  <div class="gate-wrap">
+    <div class="gate-inner">
+      <div class="masthead">
+        <div class="masthead-series">Academy &middot; Digital Safety Series &middot; No.&thinsp;1</div>
+        <h1 class="masthead-title">Understanding<br>Coercive Control</h1>
+        <p class="masthead-sub">A multi-module platform covering law, advocacy, policy, and institutional accountability. Select your role to access the appropriate module.</p>
+        <hr class="masthead-rule">
+      </div>
 
-<header class="app-header">
-  <div class="header-inner">
-    <div class="header-source">Academy &middot; Digital Safety Series &middot; No. 1</div>
-    <h1 class="header-title">Understanding Coercive Control</h1>
-    <p class="header-subtitle">A reference on abuse patterns, digital threats, and recording consent law by state</p>
+      <div class="role-grid">
+        <a class="role-card role-card--survivor" href="survivor.html">
+          <span class="role-num">01</span>
+          <div class="role-icon">&#9632;</div>
+          <div class="role-title">Personal Safety</div>
+          <p class="role-desc">Recording law lookup, pattern recognition, safety planning, and local resources. Designed for survivors and those who may be experiencing coercive control.</p>
+          <span class="role-cta">Enter &rarr;</span>
+        </a>
+
+        <a class="role-card" href="advocate.html">
+          <span class="role-num">02</span>
+          <div class="role-icon">&#9670;</div>
+          <div class="role-title">Advocate Reference</div>
+          <p class="role-desc">Law explorer with choropleth maps, documentation toolkit, digital forensics reference, and full resource directory. For DV advocates and legal professionals.</p>
+          <span class="role-cta">Enter &rarr;</span>
+        </a>
+
+        <a class="role-card" href="policy.html">
+          <span class="role-num">03</span>
+          <div class="role-icon">&#9650;</div>
+          <div class="role-title">Policy &amp; Research</div>
+          <p class="role-desc">Full statutory database, comparative matrix, legislative tracker, and case law references. Print-ready policy briefs with full methodology disclosure.</p>
+          <span class="role-cta">Enter &rarr;</span>
+        </a>
+
+        <a class="role-card" href="institutional.html">
+          <span class="role-num">04</span>
+          <div class="role-icon">&#9679;</div>
+          <div class="role-title">Workplace &amp; Whistleblower</div>
+          <p class="role-desc">Federal employment protections, state retaliation law lookup, reporting pathways with filing deadlines, and documentation guidance for institutional abuse.</p>
+          <span class="role-cta">Enter &rarr;</span>
+        </a>
+      </div>
+
+      <div class="gate-footer">
+        <a class="survey-link" href="survey.html">
+          Research participant? &rarr; AI &amp; Technology Survey
+        </a>
+        <span class="privacy-notice">No tracking &middot; No account &middot; No cookies</span>
+      </div>
+    </div>
   </div>
-</header>
 
-<div class="app-layout">
-  <nav class="sidebar" aria-label="Section navigation">
-    <div class="nav-item active" data-section="section-law" role="button" tabindex="0" aria-selected="true">
-      <span class="nav-num">01</span>
-      <span class="nav-label">Law Explorer</span>
-    </div>
-    <div class="nav-item" data-section="section-checklist" role="button" tabindex="0" aria-selected="false">
-      <span class="nav-num">02</span>
-      <span class="nav-label">Pattern Checklist</span>
-    </div>
-    <div class="nav-item" data-section="section-resources" role="button" tabindex="0" aria-selected="false">
-      <span class="nav-num">03</span>
-      <span class="nav-label">Resource Directory</span>
-    </div>
-  </nav>
-
-  <main class="main-content" id="main-content" aria-live="polite">
-    <div class="section-panel active" id="section-law"></div>
-    <div class="section-panel" id="section-checklist"></div>
-    <div class="section-panel" id="section-resources"></div>
-  </main>
-</div>
-
-<div class="footer-disclaimer" role="contentinfo">
-  <strong>This is not legal advice.</strong>
-  If you are in danger, call 911 or the National DV Hotline:
-  <a href="tel:18007997233">1-800-799-7233</a>.
-  &nbsp;&middot;&nbsp;
-  Data reflects laws as of 2026-05-22 &mdash; verify before relying on any entry.
-</div>
-
-<script>
-(function () {
-  'use strict';
-
-  // ── Navigation ──────────────────────────────────────────────────────────────
-  function setupNav() {
-    var navItems = document.querySelectorAll('.nav-item');
-    var panels   = document.querySelectorAll('.section-panel');
-
-    function activate(sectionId) {
-      panels.forEach(function (p) { p.classList.remove('active'); });
-      navItems.forEach(function (n) { n.classList.remove('active'); n.setAttribute('aria-selected','false'); });
-      var targetPanel = document.getElementById(sectionId);
-      if (targetPanel) targetPanel.classList.add('active');
-      var targetNav = document.querySelector('[data-section="' + sectionId + '"]');
-      if (targetNav) { targetNav.classList.add('active'); targetNav.setAttribute('aria-selected','true'); }
-    }
-
-    navItems.forEach(function (item) {
-      item.addEventListener('click', function () { activate(item.dataset.section); });
-      item.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(item.dataset.section); }
-      });
-    });
-  }
-
-  // ── Data bootstrap ──────────────────────────────────────────────────────────
-  var appData = null;
-
-  fetch('data.json')
-    .then(function (r) { if (!r.ok) throw new Error('fetch failed'); return r.json(); })
-    .then(function (data) {
-      appData = data;
-      setupNav();
-      renderLawExplorer(data);
-      renderPatternChecklist(data);
-      renderResourceDirectory(data);
-    })
-    .catch(function () {
-      var mc = document.getElementById('main-content');
-      var err = document.createElement('p');
-      err.style.cssText = 'color:var(--none-stat);padding:2rem;font-size:14px;line-height:1.6;';
-      err.textContent = 'Could not load data.json. Open via HTTP server, not file:// — run: python3 -m http.server 8080';
-      mc.appendChild(err);
-    });
-
-  // ── Helper: make element ─────────────────────────────────────────────────────
-  function el(tag, cls, text) {
-    var e = document.createElement(tag);
-    if (cls)  e.className   = cls;
-    if (text) e.textContent = text;
-    return e;
-  }
-
-  // ── Render Law Explorer ──────────────────────────────────────────────────────
-  function renderLawExplorer(data) {
-    var panel = document.getElementById('section-law');
-
-    // Lead stat — recording
-    var ls = el('div', 'lead-stat');
-    var lsNum = el('div', 'lead-stat-number', '38');
-    var lsBody = el('div', 'lead-stat-body');
-    lsBody.appendChild(el('div', 'lead-stat-headline', 'jurisdictions permit one-party recording.'));
-    lsBody.appendChild(el('div', 'lead-stat-sub',
-      'In most of the US, you can legally record a conversation you are part of — without notifying the other party. ' +
-      'Thirteen states require all-party consent; violation can be a felony.'));
-    ls.appendChild(lsNum);
-    ls.appendChild(lsBody);
-    panel.appendChild(ls);
-
-    // Shared detail panel
-    var detailPanel = el('div', 'detail-panel');
-    detailPanel.id = 'law-detail-panel';
-    detailPanel.style.display = 'none';
-
-    // Exhibit 01-A
-    panel.appendChild(buildExhibit('EXHIBIT 01-A', 'Recording Consent by State', data.states, 'recording', detailPanel));
-    panel.appendChild(detailPanel);
-
-    // Lead stat — CC
-    var lsCC = el('div', 'lead-stat');
-    lsCC.style.marginTop = '1.5rem';
-    var lsCCNum = el('div', 'lead-stat-number', '8');
-    var lsCCBody = el('div', 'lead-stat-body');
-    lsCCBody.appendChild(el('div', 'lead-stat-headline', 'states have some form of coercive control law.'));
-    lsCCBody.appendChild(el('div', 'lead-stat-sub',
-      'One state (Hawaii) has criminalized it — as a pilot program, verify renewal status. ' +
-      'Seven have civil provisions in family or protective order law. ' +
-      'The pattern remains legal in most US jurisdictions.'));
-    lsCC.appendChild(lsCCNum);
-    lsCC.appendChild(lsCCBody);
-    panel.appendChild(lsCC);
-
-    // Exhibit 01-B
-    panel.appendChild(buildExhibit('EXHIBIT 01-B', 'Coercive Control Statute by State', data.states, 'cc', detailPanel));
-  }
-
-  function buildExhibit(labelText, titleText, states, mode, detailPanel) {
-    var exhibit = el('div', 'exhibit');
-
-    // Header
-    var header = el('div', 'exhibit-header');
-    header.appendChild(el('span', 'exhibit-label', labelText));
-    header.appendChild(el('span', 'exhibit-title', titleText));
-    exhibit.appendChild(header);
-
-    // Body with grid
-    var body = el('div', 'exhibit-body');
-    var grid = el('div', 'state-grid');
-
-    var sorted = states.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
-
-    sorted.forEach(function (state) {
-      var cell = el('div', 'state-cell');
-      cell.setAttribute('role', 'button');
-      cell.setAttribute('tabindex', '0');
-      cell.setAttribute('aria-label', state.name);
-      cell.dataset.abbr = state.abbr;
-
-      cell.appendChild(el('span', 'state-abbr', state.abbr));
-
-      var dots = el('div', 'state-dots');
-
-      if (mode === 'recording') {
-        var d1 = el('span', 'dot dot-' + state.recording.tier);
-        d1.title = state.recording.tier === 'one-party' ? 'One-party consent' : 'All-party consent required';
-        dots.appendChild(d1);
-      }
-
-      var ccCls = state.coercive_control.status === 'criminal' ? 'criminal'
-                : state.coercive_control.status === 'civil'    ? 'civil'
-                :                                                'none';
-      var d2 = el('span', 'dot dot-' + ccCls);
-      d2.title = ccCls === 'criminal' ? 'Criminalized'
-               : ccCls === 'civil'    ? 'Civil statute'
-               :                       'No CC statute';
-      dots.appendChild(d2);
-
-      cell.appendChild(dots);
-
-      function openDetail() {
-        grid.querySelectorAll('.state-cell').forEach(function (c) { c.classList.remove('selected'); });
-        cell.classList.add('selected');
-        populateDetail(detailPanel, state);
-        detailPanel.style.display = 'block';
-        setTimeout(function () { detailPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
-      }
-
-      cell.addEventListener('click', openDetail);
-      cell.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(); }
-      });
-
-      grid.appendChild(cell);
-    });
-
-    body.appendChild(grid);
-    exhibit.appendChild(body);
-
-    // Footer legend
-    var footer = el('div', 'exhibit-footer');
-    var legend = el('div', 'exhibit-legend');
-
-    if (mode === 'recording') {
-      [['one-party','One-party consent'],['all-party','All-party required']].forEach(function (pair) {
-        var li = el('div', 'legend-item');
-        li.appendChild(el('span', 'dot dot-' + pair[0]));
-        li.appendChild(el('span', null, pair[1]));
-        legend.appendChild(li);
-      });
-      legend.appendChild(el('span', 'legend-sep', '·'));
-    }
-
-    [['criminal','Criminalized'],['civil','Civil statute'],['none','No statute']].forEach(function (pair) {
-      var li = el('div', 'legend-item');
-      li.appendChild(el('span', 'dot dot-' + pair[0]));
-      li.appendChild(el('span', null, pair[1]));
-      legend.appendChild(li);
-    });
-
-    footer.appendChild(legend);
-    footer.appendChild(el('span', 'exhibit-source', 'Source: NCSL · BWJP 2024 · verified 2026-05-22'));
-    exhibit.appendChild(footer);
-
-    return exhibit;
-  }
-
-  function populateDetail(panel, state) {
-    while (panel.firstChild) panel.removeChild(panel.firstChild);
-
-    panel.appendChild(el('div', 'detail-state-name', state.name));
-
-    var badge = el('span', 'detail-tier-badge tier-badge-' + state.recording.tier,
-      state.recording.tier === 'one-party' ? 'One-Party Consent' : 'All-Party Consent Required');
-    panel.appendChild(badge);
-
-    var grid = el('div', 'detail-grid');
-
-    // Left: recording
-    var left = el('div');
-    left.appendChild(el('div', 'detail-section-label', 'Recording Consent'));
-    left.appendChild(el('div', 'detail-statute', state.recording.statute));
-    if (state.recording.scope_note) left.appendChild(el('div', 'detail-body', state.recording.scope_note));
-    if (state.recording.interstate_note) {
-      var intNote = el('div', 'detail-note-small', 'Interstate: ' + state.recording.interstate_note);
-      left.appendChild(intNote);
-    }
-    left.appendChild(el('div', 'detail-practical', state.recording.practical));
-    grid.appendChild(left);
-
-    // Right: CC
-    var right = el('div');
-    right.appendChild(el('div', 'detail-section-label', 'Coercive Control Law'));
-
-    var ccBadge = el('span', 'detail-cc-badge cc-' + state.coercive_control.status,
-      state.coercive_control.status === 'criminal' ? 'Criminalized'
-    : state.coercive_control.status === 'civil'    ? 'Civil Statute'
-    :                                                 'No Statute');
-    right.appendChild(ccBadge);
-
-    if (state.coercive_control.statute) {
-      right.appendChild(el('div', 'detail-statute', state.coercive_control.statute));
-    }
-    if (state.coercive_control.year) {
-      right.appendChild(el('div', 'detail-note-small', 'Enacted ' + state.coercive_control.year));
-    }
-    right.appendChild(el('div', 'detail-body', state.coercive_control.scope_note));
-    grid.appendChild(right);
-
-    panel.appendChild(grid);
-  }
-
-  // ── Render Pattern Checklist ─────────────────────────────────────────────────
-  function renderPatternChecklist(data) {
-    var panel = document.getElementById('section-checklist');
-
-    panel.appendChild(el('div', 'checklist-intro',
-      'Coercive control and abuse rarely look like a single incident. They are patterns — repeated behaviors that accumulate over time. ' +
-      'This checklist maps common patterns across three dimensions. Check what applies to your situation.'));
-
-    var grid = el('div', 'checklist-grid');
-
-    data.checklist.dimensions.forEach(function (dim) {
-      var card = el('div', 'dimension-card');
-      var header = el('div', 'dimension-header');
-      header.appendChild(el('div', 'dimension-label', dim.label));
-      card.appendChild(header);
-
-      var body = el('div', 'dimension-body');
-      dim.items.forEach(function (item) {
-        var row = el('div', 'check-item');
-        var cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.id = item.id;
-        cb.addEventListener('change', updateResults);
-        var lbl = document.createElement('label');
-        lbl.setAttribute('for', item.id);
-        lbl.textContent = item.text;
-        row.appendChild(cb);
-        row.appendChild(lbl);
-        body.appendChild(row);
-      });
-
-      card.appendChild(body);
-      grid.appendChild(card);
-    });
-
-    panel.appendChild(grid);
-
-    // Results section
-    var rs = el('div', 'results-section');
-    rs.id = 'checklist-results';
-    rs.appendChild(el('div', 'results-label', 'Patterns identified in your responses'));
-
-    var cardGrid = el('div', 'result-cards');
-
-    data.checklist.dimensions.forEach(function (dim) {
-      var rc = el('div', 'result-card');
-      rc.id = 'result-' + dim.id;
-      rc.appendChild(el('div', 'result-pattern', dim.result.pattern));
-      rc.appendChild(el('div', 'result-description', dim.result.description));
-      rc.appendChild(el('div', 'result-resources-label', 'What you can do now'));
-
-      dim.result.resources.forEach(function (rid) {
-        var res = appData.resources.find(function (r) { return r.id === rid; });
-        if (!res) return;
-        var link = document.createElement('a');
-        link.className = 'result-resource-link';
-        link.textContent = res.org + ' →';
-        link.href = 'https://' + res.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        rc.appendChild(link);
-      });
-
-      cardGrid.appendChild(rc);
-    });
-
-    rs.appendChild(cardGrid);
-    panel.appendChild(rs);
-
-    function updateResults() {
-      var anyChecked = false;
-
-      data.checklist.dimensions.forEach(function (dim) {
-        var hasChecked = dim.items.some(function (item) {
-          var cb = document.getElementById(item.id);
-          return cb && cb.checked;
-        });
-
-        var rc = document.getElementById('result-' + dim.id);
-        if (rc) {
-          if (hasChecked) { rc.classList.add('visible'); anyChecked = true; }
-          else              rc.classList.remove('visible');
-        }
-      });
-
-      var rsEl = document.getElementById('checklist-results');
-      if (rsEl) {
-        if (anyChecked) rsEl.classList.add('visible');
-        else             rsEl.classList.remove('visible');
-      }
-    }
-  }
-
-  // ── Render Resource Directory ────────────────────────────────────────────────
-  function renderResourceDirectory(data) {
-    var panel = document.getElementById('section-resources');
-
-    panel.appendChild(el('p', 'resource-intro',
-      'These organizations provide crisis support, legal assistance, digital safety guidance, and documentation tools. ' +
-      'Filter by what you need.'));
-
-    var typeKeys   = ['all','crisis','legal','digital-safety','documentation','therapy'];
-    var typeLabels = {
-      'all':           'All',
-      'crisis':        'Crisis & Hotlines',
-      'legal':         'Legal Aid',
-      'digital-safety':'Digital Safety',
-      'documentation': 'Documentation',
-      'therapy':       'Therapy'
-    };
-
-    var activeFilter = 'all';
-    var chipsWrap = el('div', 'filter-chips');
-    var tbody = document.createElement('tbody');
-
-    function renderRows(filter) {
-      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
-      var filtered = filter === 'all'
-        ? data.resources
-        : data.resources.filter(function (r) { return r.type === filter; });
-
-      filtered.forEach(function (res) {
-        var tr = document.createElement('tr');
-
-        var tdOrg = document.createElement('td');
-        tdOrg.appendChild(el('span', 'resource-org', res.org));
-        tr.appendChild(tdOrg);
-
-        var tdType = document.createElement('td');
-        tdType.appendChild(el('span', 'type-badge type-' + res.type, typeLabels[res.type] || res.type));
-        tr.appendChild(tdType);
-
-        var tdScope = document.createElement('td');
-        tdScope.textContent = res.scope.charAt(0).toUpperCase() + res.scope.slice(1);
-        tr.appendChild(tdScope);
-
-        var tdContact = document.createElement('td');
-        tdContact.appendChild(el('span', 'resource-contact', res.contact));
-        tr.appendChild(tdContact);
-
-        var tdNote = document.createElement('td');
-        tdNote.textContent = res.note;
-        tr.appendChild(tdNote);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    typeKeys.forEach(function (type) {
-      var chip = el('div', 'filter-chip' + (type === 'all' ? ' active' : ''), typeLabels[type]);
-      chip.setAttribute('role', 'button');
-      chip.setAttribute('tabindex', '0');
-
-      function activate() {
-        activeFilter = type;
-        chipsWrap.querySelectorAll('.filter-chip').forEach(function (c) { c.classList.remove('active'); });
-        chip.classList.add('active');
-        renderRows(type);
-      }
-
-      chip.addEventListener('click', activate);
-      chip.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
-      });
-
-      chipsWrap.appendChild(chip);
-    });
-
-    panel.appendChild(chipsWrap);
-
-    var tableWrap = el('div', 'resource-table-wrap');
-    var table = el('table', 'resource-table');
-    table.setAttribute('role', 'table');
-
-    var thead = document.createElement('thead');
-    var headerRow = document.createElement('tr');
-    ['Organization','Type','Scope','Contact','Notes'].forEach(function (col) {
-      var th = document.createElement('th');
-      th.textContent = col;
-      headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-    table.appendChild(tbody);
-    tableWrap.appendChild(table);
-    panel.appendChild(tableWrap);
-
-    renderRows('all');
-  }
-
-})();
-</script>
+  <footer class="site-foot">
+    Not legal advice &mdash; consult a licensed attorney for your jurisdiction.
+    &nbsp;|&nbsp;
+    <a href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">National DV Hotline: 1-800-799-7233</a>
+    &nbsp;|&nbsp;
+    <a href="policy.html#methodology">Methodology &amp; Sources</a>
+  </footer>
 </body>
 </html>
