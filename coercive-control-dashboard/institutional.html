@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Institutional Protections — Coercive Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Layout ─────────────────────────────────────────────────────────────── */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+    }
+    @media (max-width: 960px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--bg-base);
+      padding: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-back {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+      text-decoration: none;
+      letter-spacing: .07em;
+      padding: 0 1.25rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+      transition: color .12s;
+    }
+    .sidebar-back:hover { color: var(--gold-mid); }
+    .sidebar-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      padding: 0 1.25rem .5rem;
+    }
+    .sidebar-nav { list-style: none; margin: 0; padding: 0; flex: 1; }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: .55rem 1.25rem;
+      letter-spacing: .04em;
+      transition: color .1s, background .1s;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav a:hover { color: var(--gold-mid); background: var(--bg-surface); border-left-color: var(--border-gold); }
+    .sidebar-nav a.active { color: var(--gold-bright); background: var(--bg-surface); border-left-color: var(--gold-mid); }
+    .sidebar-actions {
+      padding: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .btn-action {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .07em;
+      color: var(--text-3);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: .4rem .75rem;
+      cursor: pointer;
+      text-align: left;
+      transition: color .12s, border-color .12s;
+    }
+    .btn-action:hover { color: var(--gold-mid); border-color: var(--border-gold); }
+
+    /* ── Main ───────────────────────────────────────────────────────────────── */
+    .main-content { padding: 2.5rem 2.5rem 5rem; max-width: 1180px; }
+    @media (max-width: 600px) { .main-content { padding: 1.5rem 1rem 4rem; } }
+
+    .page-header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-mid);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .page-label::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--border-gold);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text-1);
+      margin-bottom: .75rem;
+    }
+    .page-desc { font-size: 14px; color: var(--text-3); line-height: 1.7; max-width: 680px; }
+
+    /* ── Section scaffolding ─────────────────────────────────────────────────── */
+    .section-panel { margin-bottom: 3rem; }
+    .section-h {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .section-h::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-title-lg {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-1);
+      margin-bottom: .625rem;
+    }
+    .section-intro { font-size: 13px; color: var(--text-3); line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* ── Alert banner ───────────────────────────────────────────────────────── */
+    .alert-critical {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: var(--none-bg);
+      border: 1px solid var(--none-border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .alert-critical-icon {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--none-fg);
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    .alert-critical-body { flex: 1; }
+    .alert-critical-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--none-fg);
+      margin-bottom: .375rem;
+    }
+    .alert-critical-text { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+    .alert-critical-deadline {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      color: var(--none-fg);
+      letter-spacing: -.01em;
+      display: block;
+      margin-top: .375rem;
+    }
+
+    /* ── Federal tables ─────────────────────────────────────────────────────── */
+    .fed-section { margin-bottom: 2rem; }
+    .fed-section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: .75rem;
+    }
+    .data-table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+    table.fed-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table.fed-table th {
+      background: var(--bg-surface);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: .5rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.fed-table td {
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      vertical-align: top;
+    }
+    table.fed-table tr:last-child td { border-bottom: none; }
+    table.fed-table tr:hover td { background: var(--bg-surface); }
+    table.fed-table tr.row-critical td { background: rgba(100,28,28,.07); }
+    table.fed-table tr.row-critical:hover td { background: rgba(100,28,28,.14); }
+    .statute-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--text-1);
+      display: block;
+      margin-bottom: .2rem;
+    }
+    .statute-citation { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+    .agency-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+    .deadline-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gold-mid);
+      white-space: nowrap;
+    }
+    .deadline-pill.deadline-critical { color: var(--none-fg); font-weight: 500; }
+    .deadline-none { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
+    .deadline-note { font-size: 11px; color: var(--text-3); line-height: 1.5; margin-top: .3rem; }
+    .statute-link {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--gold-dim);
+      text-decoration: none;
+      transition: color .1s;
+    }
+    .statute-link:hover { color: var(--gold-mid); }
+
+    /* ── Decision tree ──────────────────────────────────────────────────────── */
+    .tree-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 640px) { .tree-grid { grid-template-columns: 1fr; } }
+    .tree-card {
+      background: var(--bg-base);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: .625rem;
+      cursor: pointer;
+      transition: background .1s;
+    }
+    .tree-card:hover { background: var(--bg-surface); }
+    .tree-card.selected { background: var(--bg-elevated); border-left: 3px solid var(--gold-mid); }
+    .tree-card-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--gold-dim);
+      letter-spacing: .07em;
+    }
+    .tree-card-q {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--text-1);
+      line-height: 1.4;
+    }
+    .tree-card-sub { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+    .tree-result {
+      margin-top: 1rem;
+      display: none;
+      background: var(--bg-raised);
+      border: 1px solid var(--border-gold);
+      padding: 1.25rem;
+    }
+    .tree-result.visible { display: block; }
+    .tree-result-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .tree-result-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--text-1);
+    }
+    .tree-result-agency {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+    }
+    .tree-steps { display: grid; gap: .75rem; }
+    .tree-step { display: flex; gap: 1rem; }
+    .tree-step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+    .tree-step-body { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+    .tree-deadline-bar {
+      margin-top: 1rem;
+      padding: .625rem .875rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .tree-deadline-bar.urgent { background: var(--none-bg); border: 1px solid var(--none-border); }
+    .tree-deadline-bar.normal { background: var(--pend-bg); border: 1px solid var(--pend-border); }
+    .tree-deadline-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .tree-deadline-bar.urgent .tree-deadline-label { color: var(--none-fg); }
+    .tree-deadline-bar.normal .tree-deadline-label { color: var(--pend-fg); }
+    .tree-deadline-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+    }
+    .tree-deadline-bar.urgent .tree-deadline-val { color: var(--none-fg); }
+    .tree-deadline-bar.normal .tree-deadline-val { color: var(--pend-fg); }
+    .tree-deadline-note { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+
+    /* ── State lookup ───────────────────────────────────────────────────────── */
+    .lookup-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: .75rem;
+      flex-wrap: wrap;
+    }
+    .lookup-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    .lookup-select {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: .375rem .625rem;
+      outline: none;
+      cursor: pointer;
+      min-width: 200px;
+    }
+    .lookup-select:focus { border-color: var(--gold-mid); }
+    .state-result {
+      display: none;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      padding: 1.125rem 1.25rem;
+    }
+    .state-result.visible { display: block; }
+    .state-result-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--text-1);
+      margin-bottom: .75rem;
+    }
+    .state-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 600px) { .state-result-grid { grid-template-columns: 1fr; } }
+    .state-result-cell { background: var(--bg-base); padding: 1rem; }
+    .src-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: .5rem;
+    }
+    .src-value {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--text-1);
+      margin-bottom: .375rem;
+    }
+    .src-note { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+
+    /* ── Checklist ───────────────────────────────────────────────────────────── */
+    .checklist-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 640px) { .checklist-two-col { grid-template-columns: 1fr; } }
+    .checklist-col { background: var(--bg-base); padding: 1.25rem; }
+    .checklist-col-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: .875rem;
+    }
+    .checklist-bare { list-style: none; padding: 0; margin: 0; }
+    .checklist-bare li {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      padding: .45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+    .checklist-bare li:last-child { border-bottom: none; }
+    .check-sq {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--text-4);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── Documentation ────────────────────────────────────────────────────────── */
+    .doc-template {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-2);
+      padding: 1.25rem;
+      line-height: 1.9;
+      white-space: pre;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    .print-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--border-gold);
+      color: var(--gold-mid);
+      padding: .4rem .875rem;
+      cursor: pointer;
+      transition: background .12s;
+    }
+    .print-btn:hover { background: var(--bg-elevated); }
+
+    /* ── Resources ──────────────────────────────────────────────────────────── */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .resource-card {
+      background: var(--bg-base);
+      padding: 1rem 1.125rem;
+      display: flex;
+      flex-direction: column;
+      gap: .375rem;
+    }
+    .resource-name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: var(--text-1);
+      line-height: 1.2;
+    }
+    .resource-meta { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .125rem; }
+    .resource-contact { margin-top: auto; padding-top: .5rem; }
+    .resource-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+      text-decoration: none;
+      display: block;
+      word-break: break-all;
+    }
+    .resource-link:hover { color: var(--gold-bright); }
+    .resource-empty {
+      padding: 2rem;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      grid-column: 1 / -1;
+    }
+
+    .important-note {
+      margin-top: .875rem;
+      padding: .625rem .75rem;
+      background: var(--pend-bg);
+      border: 1px solid var(--pend-border);
+    }
+    .important-note-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--pend-fg);
+      letter-spacing: .08em;
+      margin-bottom: .25rem;
+    }
+    .important-note-body { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+    /* ── Print ──────────────────────────────────────────────────────────────── */
+    @media print {
+      .sidebar, .site-header, .footer-bar { display: none; }
+      .app-layout { display: block; }
+      .main-content { padding: 0; max-width: 100%; }
+      .tree-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="back-link" href="index.html" style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);text-decoration:none;letter-spacing:.06em;">&#8592; Role Gate</a>
+      <nav class="header-nav">
+        <a href="survivor.html">Personal Safety</a>
+        <a href="advocate.html">Advocate</a>
+        <a href="policy.html">Policy</a>
+        <a href="institutional.html" class="active">Institutional</a>
+      </nav>
+      <button class="exit-site-btn" onclick="leaveNow()" aria-label="Exit site immediately">&#9632; Exit Site Now</button>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <nav class="sidebar">
+      <a class="sidebar-back" href="index.html">&#8592; Role Gate</a>
+      <div class="sidebar-label">Sections</div>
+      <ul class="sidebar-nav">
+        <li><a href="#federal-employment" class="active">Federal Employment</a></li>
+        <li><a href="#whistleblower">Whistleblower</a></li>
+        <li><a href="#decision-tree">Reporting Path</a></li>
+        <li><a href="#state-lookup">State Lookup</a></li>
+        <li><a href="#checklist">Workplace Checklist</a></li>
+        <li><a href="#documentation">Documentation</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ul>
+      <div class="sidebar-actions">
+        <button class="btn-action" onclick="window.print()">Print / Export PDF</button>
+      </div>
+    </nav>
+
+    <main class="main-content">
+
+      <div class="page-header">
+        <div class="page-label">Institutional Protections</div>
+        <h1 class="page-title">Workplace &amp; Whistleblower Law</h1>
+        <p class="page-desc">Federal employment protections, retaliation remedies, state-level statute lookup, and reporting decision trees for workplace coercive control situations. Not legal advice — consult a licensed attorney for your jurisdiction.</p>
+      </div>
+
+      <!-- OSHA 30-day critical alert — rendered statically, not from data -->
+      <div class="alert-critical" role="alert" aria-label="Critical filing deadline warning">
+        <div class="alert-critical-icon">!</div>
+        <div class="alert-critical-body">
+          <div class="alert-critical-label">Critical Deadline — OSHA § 11(c)</div>
+          <div class="alert-critical-text">
+            OSHA's anti-retaliation provision has the strictest filing window of any federal statute on this page. If an employer retaliated against you for reporting a workplace safety violation, you have:
+            <span class="alert-critical-deadline">30 days to file</span>
+            from the date of the retaliatory act. Miss this window and you permanently lose your federal OSHA remedy.
+          </div>
+        </div>
+      </div>
+
+      <!-- FEDERAL EMPLOYMENT PROTECTIONS -->
+      <section id="federal-employment" class="section-panel">
+        <div class="section-h">Federal Employment Protections</div>
+        <h2 class="section-title-lg">Employment Statutes</h2>
+        <p class="section-intro">Four federal statutes create floors for workplace protection. State law may provide broader coverage — use the State Lookup below.</p>
+        <div class="fed-section">
+          <div class="data-table-wrap">
+            <table class="fed-table" id="workplace-table" aria-label="Federal workplace protection statutes">
+              <thead>
+                <tr>
+                  <th>Statute</th>
+                  <th>Agency</th>
+                  <th>Filing Deadline</th>
+                  <th>Scope</th>
+                </tr>
+              </thead>
+              <tbody id="workplace-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHISTLEBLOWER PROTECTIONS -->
+      <section id="whistleblower" class="section-panel">
+        <div class="section-h">Whistleblower Protections</div>
+        <h2 class="section-title-lg">Whistleblower Statutes</h2>
+        <p class="section-intro">Retaliation for reporting financial fraud, securities violations, or safety hazards is independently actionable under these federal statutes.</p>
+        <div class="fed-section">
+          <div class="data-table-wrap">
+            <table class="fed-table" id="whistleblower-table" aria-label="Federal whistleblower protection statutes">
+              <thead>
+                <tr>
+                  <th>Statute</th>
+                  <th>Agency</th>
+                  <th>Filing Deadline</th>
+                  <th>Scope</th>
+                </tr>
+              </thead>
+              <tbody id="whistleblower-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTING DECISION TREE -->
+      <section id="decision-tree" class="section-panel">
+        <div class="section-h">Reporting Path</div>
+        <h2 class="section-title-lg">Which Agency Do I File With?</h2>
+        <p class="section-intro">Select the scenario that most closely matches your situation. Filing with the wrong agency can forfeit your deadline.</p>
+
+        <div class="tree-grid">
+          <div class="tree-card" role="button" tabindex="0" onclick="selectPath('eeoc')" onkeydown="if(event.key==='Enter')selectPath('eeoc')">
+            <div class="tree-card-num">PATH 01</div>
+            <div class="tree-card-q">Workplace harassment, discrimination, or hostile environment</div>
+            <div class="tree-card-sub">Rooted in sex, disability, protected class — or coercive control tactics imported into the workplace by an intimate partner or coworker.</div>
+          </div>
+          <div class="tree-card" role="button" tabindex="0" onclick="selectPath('fmla')" onkeydown="if(event.key==='Enter')selectPath('fmla')">
+            <div class="tree-card-num">PATH 02</div>
+            <div class="tree-card-q">Need leave for trauma, medical care, or safety planning</div>
+            <div class="tree-card-sub">Employer denied or interfered with medical or family leave — or retaliated after you requested it.</div>
+          </div>
+          <div class="tree-card" role="button" tabindex="0" onclick="selectPath('nlrb')" onkeydown="if(event.key==='Enter')selectPath('nlrb')">
+            <div class="tree-card-num">PATH 03</div>
+            <div class="tree-card-q">Disciplined for organizing or collective workplace complaint</div>
+            <div class="tree-card-sub">Employer retaliated against you for acting with coworkers — with or without a union — to address a shared workplace concern.</div>
+          </div>
+          <div class="tree-card" role="button" tabindex="0" onclick="selectPath('osha')" onkeydown="if(event.key==='Enter')selectPath('osha')">
+            <div class="tree-card-num">PATH 04 — URGENT</div>
+            <div class="tree-card-q">Retaliated for reporting a safety violation to OSHA</div>
+            <div class="tree-card-sub">You reported a hazard to OSHA or raised a safety concern internally, and the employer retaliated within the last 30 days.</div>
+          </div>
+        </div>
+
+        <div class="tree-result" id="tree-result" aria-live="polite"></div>
+      </section>
+
+      <!-- STATE LOOKUP -->
+      <section id="state-lookup" class="section-panel">
+        <div class="section-h">State Retaliation Context</div>
+        <h2 class="section-title-lg">State Law Lookup</h2>
+        <p class="section-intro">Many states have broader workplace retaliation protections than federal law. This lookup surfaces each state's coercive control statute status — a key indicator of how state courts may interpret workplace abuse claims.</p>
+
+        <div class="lookup-row">
+          <label class="lookup-label" for="state-lookup-select">Select state:</label>
+          <select id="state-lookup-select" class="lookup-select" onchange="lookupState(this.value)" aria-label="State lookup selector">
+            <option value="">— Select a state —</option>
+          </select>
+        </div>
+
+        <div class="state-result" id="state-result"></div>
+      </section>
+
+      <!-- WORKPLACE ABUSE CHECKLIST -->
+      <section id="checklist" class="section-panel">
+        <div class="section-h">Workplace Abuse Checklist</div>
+        <h2 class="section-title-lg">Recognizing the Pattern</h2>
+        <p class="section-intro">Coercive control often follows survivors into the workplace. These behaviors may constitute hostile work environment, stalking, or retaliation under federal and state law.</p>
+
+        <div class="checklist-two-col">
+          <div class="checklist-col">
+            <div class="checklist-col-label">From an intimate partner</div>
+            <ul class="checklist-bare">
+              <li><span class="check-sq" aria-hidden="true"></span>Calls, texts, or shows up at your workplace repeatedly despite requests to stop</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Contacts your employer, supervisor, or coworkers to damage your reputation</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Threatens to sabotage your employment, report you to HR, or send embarrassing material</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Monitors your location via device or shared apps during work hours</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Controls access to transportation, childcare, or finances to prevent you from going to work</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Causes injuries timed to your work schedule to force absences</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Uses your workplace contact information gained without consent</li>
+            </ul>
+          </div>
+          <div class="checklist-col">
+            <div class="checklist-col-label">From an employer or coworker</div>
+            <ul class="checklist-bare">
+              <li><span class="check-sq" aria-hidden="true"></span>Disproportionate discipline after you disclosed a personal safety situation</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Denied leave, accommodation request, or schedule flexibility without explanation</li>
+              <li><span class="check-sq" aria-hidden="true"></span>HR investigation opened shortly after you raised a concern or complaint</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Performance review downgraded after return from leave</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Transferred, reassigned, or isolated after disclosing abuse to a supervisor</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Coworker or supervisor shares or amplifies personal information about your situation</li>
+              <li><span class="check-sq" aria-hidden="true"></span>Employer failed to take action after you reported workplace harassment or safety threat</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="important-note">
+          <div class="important-note-label">Document Everything</div>
+          <p class="important-note-body">Pattern evidence matters in workplace coercive control claims. Each incident alone may fall below a legal threshold — the pattern across incidents is the claim. Use the template below to log each event with date, time, witnesses, and outcome.</p>
+        </div>
+      </section>
+
+      <!-- DOCUMENTATION TOOLKIT -->
+      <section id="documentation" class="section-panel">
+        <div class="section-h">Documentation</div>
+        <h2 class="section-title-lg">Workplace Incident Log</h2>
+        <p class="section-intro">Use this template for each incident. Keep copies in two locations not accessible to the subject — encrypted cloud storage and a personal device not connected to work networks.</p>
+
+        <pre class="doc-template">WORKPLACE INCIDENT LOG — CONFIDENTIAL
+══════════════════════════════════════════════════════════════
+
+Date of incident:    ___________________________
+Time:                ___________________________
+Location:            ___________________________  (building, floor, room, remote)
+My role / position:  ___________________________
+Subject of entry:    ___________________________  (name + relationship: supervisor / coworker / IP)
+
+─── INCIDENT DESCRIPTION ───────────────────────────────────────────
+(Use exact words. Note tone, volume, context.)
+
+
+
+
+─── WITNESSES ──────────────────────────────────────────────────────
+Name:                ___________________________  Role: ____________
+Name:                ___________________________  Role: ____________
+
+─── EVIDENCE PRESERVED ─────────────────────────────────────────────
+☐ Email / message screenshot (filename: ______________)
+☐ Call log export (filename: __________________)
+☐ Physical item (describe + storage location): ___________________
+☐ Medical/clinical record obtained: ___________________________
+
+─── EMPLOYER NOTICE ────────────────────────────────────────────────
+Did you notify HR or a supervisor?   ☐ Yes  ☐ No
+If yes — to whom:    ___________________________
+Date/time reported:  ___________________________
+Their response:      ___________________________
+
+─── IMPACT ─────────────────────────────────────────────────────────
+Work impact (missed time, performance, pay):
+
+
+Safety impact (fear, physical harm, housing):
+
+
+─── NEXT STEP ──────────────────────────────────────────────────────
+☐ EEOC charge       deadline: _____________
+☐ NLRB charge       deadline: _____________
+☐ OSHA complaint    STRICT 30-DAY DEADLINE: _____________
+☐ Consult attorney  scheduled: _____________
+
+Documented by: __________________________ Date logged: ___________</pre>
+
+        <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+          <button class="print-btn" onclick="window.print()">Print Template</button>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-4);">Or save as PDF — Cmd+P / Ctrl+P</span>
+        </div>
+      </section>
+
+      <!-- RESOURCE DIRECTORY -->
+      <section id="resources" class="section-panel">
+        <div class="section-h">Resources</div>
+        <h2 class="section-title-lg">Workplace &amp; Whistleblower Resources</h2>
+        <p class="section-intro">Organizations providing legal support, advocacy, and direct assistance for workplace and whistleblower situations.</p>
+        <div class="resource-grid" id="resource-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer-bar">
+    <span>Not legal advice — consult a licensed attorney for your jurisdiction.</span>
+    <a href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">DV Hotline: 1-800-799-7233</a>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const STALE_MS = 365 * 24 * 60 * 60 * 1000;
+    const TODAY = Date.now();
+
+    const TYPE_LABELS = {
+      crisis: 'Crisis', legal: 'Legal', digital: 'Digital',
+      advocacy: 'Advocacy', policy: 'Policy', whistleblower: 'Whistleblower'
+    };
+
+    const CC_STATUS_LABELS = {
+      criminal: 'Criminal Statute',
+      civil: 'Civil Provision Only',
+      both: 'Criminal + Civil',
+      pending: 'Pending Legislation',
+      none: 'No Statute'
+    };
+
+    const REPORTING_PATHS = {
+      eeoc: {
+        title: 'File with the EEOC',
+        agency: 'Equal Employment Opportunity Commission',
+        deadlineDays: 180,
+        deadlineExtended: 300,
+        urgency: 'normal',
+        steps: [
+          'File a charge of discrimination at eeoc.gov or at a local EEOC field office. You cannot sue under Title VII or ADA without first exhausting the EEOC process.',
+          'The EEOC will notify the employer and may attempt mediation. If no resolution, you receive a Right to Sue letter — you then have 90 days to file a federal lawsuit.',
+          'If your state has a Fair Employment Practices Agency (FEPA), the deadline extends to 300 days. Filing with the state agency is cross-filed with the EEOC automatically in dual-filing states.',
+          'Preserve all related documentation — emails, performance reviews, HR communications — before filing. Evidence requested after filing may be harder to obtain.'
+        ],
+        deadlineNote: '300 days in dual-filing FEPA states'
+      },
+      fmla: {
+        title: 'File with DOL Wage and Hour Division',
+        agency: 'Department of Labor',
+        deadlineDays: null,
+        urgency: 'normal',
+        steps: [
+          'FMLA does not require a formal charge before suing — you may file directly in federal court. However, filing an administrative complaint with the DOL Wage and Hour Division is a common first step and may lead to faster resolution.',
+          'Notify your employer of your need for leave as soon as practicable. FMLA requires you to provide enough information that the employer can recognize the leave may be FMLA-qualifying.',
+          'Keep records of your leave request, any medical certifications submitted, and all employer responses or denials.',
+          'FMLA applies to employers with 50+ employees within 75 miles. If your employer is smaller, look for state equivalents — many states cover smaller employers.'
+        ],
+        deadlineNote: 'No federal administrative deadline, but the 2-year statute of limitations (3 years for willful violations) applies to private lawsuits'
+      },
+      nlrb: {
+        title: 'File an Unfair Labor Practice charge with NLRB',
+        agency: 'National Labor Relations Board',
+        deadlineDays: 180,
+        urgency: 'normal',
+        steps: [
+          'File a charge (Form NLRB-501) at the regional NLRB office covering your worksite. The NLRB investigates unfair labor practice charges at no cost to you.',
+          'The charge must be filed within 180 days of the unfair labor practice. Evidence older than 180 days may still support the pattern but cannot anchor the charge.',
+          'You do not need a union to file. NLRA § 7 protects concerted activity — two or more employees acting together to address a shared workplace concern — even without union representation.',
+          'If the NLRB finds merit, it issues a complaint and the case proceeds to a hearing before an administrative law judge. Remedies include reinstatement, back pay, and cessation of the unlawful conduct.'
+        ],
+        deadlineNote: null
+      },
+      osha: {
+        title: 'File OSHA § 11(c) Complaint — URGENT',
+        agency: 'Occupational Safety and Health Administration',
+        deadlineDays: 30,
+        urgency: 'urgent',
+        steps: [
+          'File immediately. OSHA § 11(c) has a strict 30-day filing window. Call 1-800-321-OSHA (6742) or submit online at osha.gov to initiate the complaint. Do not wait to consult an attorney first — file to preserve the deadline, then seek counsel.',
+          'The complaint must allege that: (1) you engaged in a protected activity (reported a safety concern to OSHA or internally), and (2) the employer took adverse action because of that activity.',
+          'OSHA investigates and may issue a citation. Remedies include reinstatement, back pay, attorney fees, and compensatory damages.',
+          'If OSHA does not act within 90 days of your complaint, you may file a complaint in federal district court directly under § 11(c).'
+        ],
+        deadlineNote: 'Strict 30-day window — no exceptions'
+      }
+    };
+
+    function isStale(dateStr) {
+      if (!dateStr) return false;
+      return TODAY - new Date(dateStr).getTime() > STALE_MS;
+    }
+
+    function makeTag(text, cls) {
+      const span = document.createElement('span');
+      span.className = 'badge' + (cls ? ' ' + cls : '');
+      span.textContent = text;
+      return span;
+    }
+
+    function buildFedTable(statutes, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody || !statutes) return;
+      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+      statutes.forEach(s => {
+        const isCritical = s.filing_deadline_days === 30;
+        const tr = document.createElement('tr');
+        if (isCritical) tr.className = 'row-critical';
+
+        // Statute + citation
+        const tdStat = document.createElement('td');
+        const nameEl = document.createElement('span');
+        nameEl.className = 'statute-name';
+        nameEl.textContent = s.statute;
+        tdStat.appendChild(nameEl);
+        const citEl = document.createElement('div');
+        citEl.className = 'statute-citation';
+        citEl.textContent = s.citation;
+        tdStat.appendChild(citEl);
+        if (s.url) {
+          const lnk = document.createElement('a');
+          lnk.className = 'statute-link';
+          lnk.href = s.url;
+          lnk.target = '_blank';
+          lnk.rel = 'noopener noreferrer';
+          lnk.textContent = 'Official source ↗';
+          tdStat.appendChild(lnk);
+        }
+        tr.appendChild(tdStat);
+
+        // Agency
+        const tdAgency = document.createElement('td');
+        const agEl = document.createElement('span');
+        agEl.className = 'agency-label';
+        agEl.textContent = s.agency;
+        tdAgency.appendChild(agEl);
+        if (isStale(s.last_verified)) {
+          const stale = document.createElement('div');
+          stale.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--warn-fg);margin-top:.25rem;';
+          stale.textContent = '△ Data may be stale';
+          tdAgency.appendChild(stale);
+        }
+        tr.appendChild(tdAgency);
+
+        // Deadline
+        const tdDl = document.createElement('td');
+        if (s.filing_deadline_days) {
+          const pill = document.createElement('div');
+          pill.className = 'deadline-pill' + (isCritical ? ' deadline-critical' : '');
+          pill.textContent = s.filing_deadline_days + ' days';
+          tdDl.appendChild(pill);
+          if (s.extended_deadline_days) {
+            const ext = document.createElement('div');
+            ext.className = 'deadline-note';
+            ext.textContent = s.extended_deadline_days + ' days — ' + s.extended_deadline_note;
+            tdDl.appendChild(ext);
+          }
+          if (isCritical) {
+            const warn = document.createElement('div');
+            warn.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--none-fg);margin-top:.3rem;letter-spacing:.05em;';
+            warn.textContent = 'STRICT — no extensions';
+            tdDl.appendChild(warn);
+          }
+        } else {
+          const none = document.createElement('span');
+          none.className = 'deadline-none';
+          none.textContent = 'No filing deadline';
+          tdDl.appendChild(none);
+          if (s.scope && s.scope.toLowerCase().includes('statute of limitations')) {
+            const note = document.createElement('div');
+            note.className = 'deadline-note';
+            note.textContent = 'Civil SOL applies — consult counsel';
+            tdDl.appendChild(note);
+          }
+        }
+        tr.appendChild(tdDl);
+
+        // Scope
+        const tdScope = document.createElement('td');
+        tdScope.style.cssText = 'font-size:12px;color:var(--text-3);line-height:1.6;max-width:320px;';
+        tdScope.textContent = s.scope;
+        tr.appendChild(tdScope);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.selectPath = function(key) {
+      document.querySelectorAll('.tree-card').forEach(c => c.classList.remove('selected'));
+      const cards = document.querySelectorAll('.tree-card');
+      const PATHS = ['eeoc','fmla','nlrb','osha'];
+      const idx = PATHS.indexOf(key);
+      if (idx >= 0 && cards[idx]) cards[idx].classList.add('selected');
+
+      const path = REPORTING_PATHS[key];
+      if (!path) return;
+
+      const result = document.getElementById('tree-result');
+      while (result.firstChild) result.removeChild(result.firstChild);
+
+      const header = document.createElement('div');
+      header.className = 'tree-result-header';
+      const titleEl = document.createElement('div');
+      titleEl.className = 'tree-result-title';
+      titleEl.textContent = path.title;
+      header.appendChild(titleEl);
+      const agencyEl = document.createElement('div');
+      agencyEl.className = 'tree-result-agency';
+      agencyEl.textContent = path.agency;
+      header.appendChild(agencyEl);
+      result.appendChild(header);
+
+      const stepsEl = document.createElement('div');
+      stepsEl.className = 'tree-steps';
+      path.steps.forEach((text, i) => {
+        const row = document.createElement('div');
+        row.className = 'tree-step';
+        const num = document.createElement('span');
+        num.className = 'tree-step-num';
+        num.textContent = String(i + 1).padStart(2, '0');
+        row.appendChild(num);
+        const body = document.createElement('p');
+        body.className = 'tree-step-body';
+        body.textContent = text;
+        row.appendChild(body);
+        stepsEl.appendChild(row);
+      });
+      result.appendChild(stepsEl);
+
+      const bar = document.createElement('div');
+      bar.className = 'tree-deadline-bar ' + (path.urgency === 'urgent' ? 'urgent' : 'normal');
+      const barLabel = document.createElement('span');
+      barLabel.className = 'tree-deadline-label';
+      barLabel.textContent = 'Filing Deadline';
+      bar.appendChild(barLabel);
+      const barVal = document.createElement('span');
+      barVal.className = 'tree-deadline-val';
+      barVal.textContent = path.deadlineDays ? path.deadlineDays + ' days' : 'None (SOL applies)';
+      bar.appendChild(barVal);
+      if (path.deadlineNote) {
+        const barNote = document.createElement('span');
+        barNote.className = 'tree-deadline-note';
+        barNote.textContent = path.deadlineNote;
+        bar.appendChild(barNote);
+      }
+      result.appendChild(bar);
+
+      result.classList.add('visible');
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    function buildStateSelect(states) {
+      const sel = document.getElementById('state-lookup-select');
+      [...states].sort((a, b) => a.name.localeCompare(b.name)).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.abbr;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
+    }
+
+    let stateByAbbr = {};
+
+    window.lookupState = function(abbr) {
+      const s = stateByAbbr[abbr];
+      const container = document.getElementById('state-result');
+      if (!s || !abbr) { container.classList.remove('visible'); return; }
+
+      while (container.firstChild) container.removeChild(container.firstChild);
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'state-result-name';
+      nameEl.textContent = s.name;
+      container.appendChild(nameEl);
+
+      const grid = document.createElement('div');
+      grid.className = 'state-result-grid';
+
+      // CC statute cell
+      const cc = s.coercive_control || {};
+      const ccCell = document.createElement('div');
+      ccCell.className = 'state-result-cell';
+      const ccLabel = document.createElement('div');
+      ccLabel.className = 'src-label';
+      ccLabel.textContent = 'Coercive Control Statute';
+      ccCell.appendChild(ccLabel);
+      const ccVal = document.createElement('div');
+      ccVal.className = 'src-value';
+      ccVal.textContent = CC_STATUS_LABELS[cc.status] || cc.status || 'Unknown';
+      ccCell.appendChild(ccVal);
+      if (cc.statute) {
+        const ccStat = document.createElement('div');
+        ccStat.className = 'src-note';
+        ccStat.textContent = cc.statute;
+        ccCell.appendChild(ccStat);
+      }
+      if (cc.scope_note) {
+        const ccScope = document.createElement('div');
+        ccScope.className = 'src-note';
+        ccScope.style.marginTop = '.375rem';
+        ccScope.textContent = cc.scope_note;
+        ccCell.appendChild(ccScope);
+      }
+      if (cc.status === 'criminal' || cc.status === 'both') {
+        const note = document.createElement('div');
+        note.style.cssText = 'margin-top:.625rem;padding:.5rem .625rem;background:var(--ok-bg);border:1px solid var(--ok-border);font-size:12px;color:var(--ok-fg);line-height:1.5;';
+        note.textContent = 'State criminal statute may support parallel state workplace retaliation claims. Consult a state employment attorney.';
+        ccCell.appendChild(note);
+      }
+      grid.appendChild(ccCell);
+
+      // Recording cell
+      const rec = s.recording || {};
+      const recCell = document.createElement('div');
+      recCell.className = 'state-result-cell';
+      const recLabel = document.createElement('div');
+      recLabel.className = 'src-label';
+      recLabel.textContent = 'Recording Consent Tier';
+      recCell.appendChild(recLabel);
+      const recVal = document.createElement('div');
+      recVal.className = 'src-value';
+      const tier = (rec.tier || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      recVal.textContent = tier || '—';
+      recCell.appendChild(recVal);
+      if (rec.statute) {
+        const recStat = document.createElement('div');
+        recStat.className = 'src-note';
+        recStat.textContent = rec.statute;
+        recCell.appendChild(recStat);
+      }
+      if (rec.practical) {
+        const recPrac = document.createElement('div');
+        recPrac.className = 'src-note';
+        recPrac.style.marginTop = '.375rem';
+        recPrac.textContent = rec.practical;
+        recCell.appendChild(recPrac);
+      }
+      if (rec.tier === 'all-party') {
+        const warn = document.createElement('div');
+        warn.style.cssText = 'margin-top:.625rem;padding:.5rem .625rem;background:var(--warn-bg);border:1px solid var(--warn-border);font-size:12px;color:var(--warn-fg);line-height:1.5;';
+        warn.textContent = 'All-party consent state. Do not record workplace conversations without all parties’ consent — doing so may be a criminal offense.';
+        recCell.appendChild(warn);
+      }
+      grid.appendChild(recCell);
+
+      container.appendChild(grid);
+      container.classList.add('visible');
+    };
+
+    function buildResources(resources) {
+      const workplaceResources = resources.filter(r =>
+        (r.populations || []).some(p => p === 'workplace') ||
+        r.type === 'whistleblower'
+      );
+      const grid = document.getElementById('resource-grid');
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+      if (!workplaceResources.length) {
+        const empty = document.createElement('div');
+        empty.className = 'resource-empty';
+        empty.textContent = 'No resources found.';
+        grid.appendChild(empty);
+        return;
+      }
+
+      workplaceResources.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'resource-card';
+
+        const name = document.createElement('div');
+        name.className = 'resource-name';
+        name.textContent = r.name;
+        card.appendChild(name);
+
+        const meta = document.createElement('div');
+        meta.className = 'resource-meta';
+        if (r.type) meta.appendChild(makeTag(TYPE_LABELS[r.type] || r.type, 'badge--pend'));
+        (r.populations || []).forEach(p => meta.appendChild(makeTag(p)));
+        (r.languages || []).slice(0, 3).forEach(l => meta.appendChild(makeTag(l)));
+        card.appendChild(meta);
+
+        const contact = document.createElement('div');
+        contact.className = 'resource-contact';
+        if (r.phone) {
+          const phone = document.createElement('div');
+          phone.style.cssText = 'font-family:var(--font-mono);font-size:12px;color:var(--text-2);';
+          phone.textContent = r.phone + (r.text ? ' · ' + r.text : '');
+          contact.appendChild(phone);
+        }
+        if (r.url) {
+          const link = document.createElement('a');
+          link.className = 'resource-link';
+          link.href = r.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = r.url.replace(/^https?:\/\//, '');
+          contact.appendChild(link);
+        }
+        card.appendChild(contact);
+        grid.appendChild(card);
+      });
+    }
+
+    async function init() {
+      try {
+        const data = await fetch('data.json').then(r => r.json());
+
+        // Federal tables
+        buildFedTable((data.federal || {}).workplace || [], 'workplace-tbody');
+        buildFedTable((data.federal || {}).whistleblower || [], 'whistleblower-tbody');
+
+        // State lookup
+        (data.states || []).forEach(s => { stateByAbbr[s.abbr] = s; });
+        buildStateSelect(data.states || []);
+
+        // Resources
+        buildResources(data.resources_national || []);
+
+      } catch (err) {
+        console.error('Initialization failed:', err);
+      }
+    }
+
+    // Sidebar active-link tracking via IntersectionObserver
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          document.querySelectorAll('.sidebar-nav a').forEach(l => {
+            l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: .2 });
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+    init();
+  })();
+
+  function leaveNow() { window.location.replace('https://www.google.com'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') leaveNow(); });
+  </script>
+</body>
+</html>

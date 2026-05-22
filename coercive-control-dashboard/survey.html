@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Experience Survey — Coercive Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Layout ─────────────────────────────────────────────────────────────── */
+    .survey-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 3rem 1.5rem 6rem;
+    }
+    .survey-shell {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ── Progress bar ────────────────────────────────────────────────────────── */
+    .progress-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      margin-bottom: 2rem;
+    }
+    .progress-bar-track {
+      flex: 1;
+      height: 2px;
+      background: var(--bg-elevated);
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold-mid);
+      transition: width .4s ease;
+    }
+    .progress-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      letter-spacing: .07em;
+      white-space: nowrap;
+    }
+
+    /* ── Screen panels ───────────────────────────────────────────────────────── */
+    .survey-screen { display: none; }
+    .survey-screen.visible { display: block; }
+
+    /* ── Consent screen ──────────────────────────────────────────────────────── */
+    .consent-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .consent-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold-mid);
+      margin-bottom: .75rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .consent-label::before { content: ''; display: block; width: 18px; height: 1px; background: var(--border-gold); }
+    .consent-title {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 5vw, 42px);
+      font-weight: 400;
+      color: var(--text-1);
+      line-height: 1.1;
+      margin-bottom: .625rem;
+    }
+    .consent-desc { font-size: 14px; color: var(--text-3); line-height: 1.75; }
+
+    .consent-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 500px) { .consent-cards { grid-template-columns: 1fr; } }
+    .consent-card {
+      background: var(--bg-base);
+      padding: 1rem;
+    }
+    .consent-card-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: .5rem;
+    }
+    .consent-card-body { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+
+    .privacy-block {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .privacy-block-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: .625rem;
+    }
+    .privacy-item {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      padding: .35rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+    .privacy-item:last-child { border-bottom: none; }
+    .privacy-item-icon {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ok-fg);
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .path-choice {
+      margin-bottom: 1.5rem;
+    }
+    .path-choice-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: .875rem;
+    }
+    .path-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .path-card {
+      background: var(--bg-base);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: .875rem;
+      transition: background .1s;
+      border-left: 3px solid transparent;
+    }
+    .path-card:hover { background: var(--bg-surface); }
+    .path-card.selected { background: var(--bg-elevated); border-left-color: var(--gold-mid); }
+    .path-card-radio {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--text-4);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 3px;
+      position: relative;
+      background: none;
+    }
+    .path-card.selected .path-card-radio::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold-mid);
+    }
+    .path-card-body { flex: 1; }
+    .path-card-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: var(--text-1);
+      margin-bottom: .25rem;
+    }
+    .path-card-desc { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+
+    /* ── Question screen ─────────────────────────────────────────────────────── */
+    .q-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .q-number {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      letter-spacing: .07em;
+    }
+    .q-skip {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 0;
+      transition: color .1s;
+    }
+    .q-skip:hover { color: var(--text-2); }
+
+    .q-block { margin-bottom: 1.25rem; }
+    .q-text {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-1);
+      line-height: 1.35;
+      margin-bottom: .375rem;
+    }
+    .q-context { font-size: 13px; color: var(--text-3); line-height: 1.65; margin-bottom: 1.25rem; }
+
+    /* Radio / checkbox options */
+    .q-options { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .q-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      background: var(--bg-base);
+      padding: .75rem 1rem;
+      cursor: pointer;
+      transition: background .1s;
+      border-left: 2px solid transparent;
+    }
+    .q-opt:hover { background: var(--bg-surface); }
+    .q-opt.selected { background: var(--bg-elevated); border-left-color: var(--gold-mid); }
+    .q-opt input[type="radio"],
+    .q-opt input[type="checkbox"] { display: none; }
+    .q-opt-indicator {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--text-4);
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      background: none;
+    }
+    .q-opt-indicator.circle { border-radius: 50%; }
+    .q-opt.selected .q-opt-indicator::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold-mid);
+    }
+    .q-opt.selected .q-opt-indicator.square::after {
+      top: 2px; left: 2px;
+      width: 8px; height: 8px;
+      border-radius: 0;
+    }
+    .q-opt-label { font-size: 13px; color: var(--text-2); line-height: 1.5; flex: 1; }
+
+    /* Text area */
+    .q-textarea {
+      width: 100%;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      font-size: 13px;
+      font-family: var(--font-body);
+      padding: .75rem 1rem;
+      resize: vertical;
+      min-height: 90px;
+      box-sizing: border-box;
+      line-height: 1.6;
+    }
+    .q-textarea::placeholder { color: var(--text-4); }
+    .q-textarea:focus { outline: none; border-color: var(--border-gold); }
+
+    /* Scale */
+    .q-scale {
+      display: grid;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .q-scale-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: .5rem;
+    }
+    .q-scale-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      padding: .375rem 1rem;
+      background: var(--bg-surface);
+    }
+    .q-scale-opt {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      background: var(--bg-base);
+      padding: .625rem 1rem;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background .1s;
+    }
+    .q-scale-opt:hover { background: var(--bg-surface); }
+    .q-scale-opt.selected { background: var(--bg-elevated); border-left-color: var(--gold-mid); }
+    .q-scale-opt input { display: none; }
+    .q-scale-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-3);
+      width: 16px;
+      text-align: center;
+    }
+    .q-scale-opt.selected .q-scale-num { color: var(--gold-mid); }
+
+    /* ── Navigation ──────────────────────────────────────────────────────────── */
+    .q-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .btn-back {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      background: none;
+      border: 1px solid var(--border);
+      padding: .5rem .875rem;
+      cursor: pointer;
+      transition: color .12s, border-color .12s;
+    }
+    .btn-back:hover { color: var(--text-2); border-color: var(--border-gold); }
+    .btn-next {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--bg-void);
+      background: var(--gold-mid);
+      border: none;
+      padding: .5rem 1.25rem;
+      cursor: pointer;
+      letter-spacing: .06em;
+      transition: background .12s;
+    }
+    .btn-next:hover { background: var(--gold-bright); }
+    .btn-next:disabled { background: var(--bg-elevated); color: var(--text-4); cursor: not-allowed; }
+
+    /* ── Submission screen ───────────────────────────────────────────────────── */
+    .submit-header { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+    .submit-title { font-family: var(--font-display); font-size: 28px; font-weight: 400; color: var(--text-1); margin-bottom: .5rem; }
+    .submit-desc { font-size: 13px; color: var(--text-3); line-height: 1.7; }
+
+    .submit-panel { display: none; }
+    .submit-panel.visible { display: block; }
+
+    /* Print path */
+    .print-panel { }
+    .print-summary { background: var(--bg-raised); border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1rem; }
+    .print-summary-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); margin-bottom: .875rem; }
+    .print-response { padding: .5rem 0; border-bottom: 1px solid var(--border); }
+    .print-response:last-child { border-bottom: none; }
+    .print-q { font-family: var(--font-mono); font-size: 10px; color: var(--text-4); margin-bottom: .2rem; }
+    .print-a { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+
+    /* Netlify forms — hidden from UI, present in DOM for Netlify build detection */
+    .netlify-forms { display: none; }
+
+    /* ── Completion ──────────────────────────────────────────────────────────── */
+    .complete-panel {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+    .complete-panel.visible { display: block; }
+    .complete-mark {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      color: var(--ok-fg);
+      margin-bottom: 1rem;
+    }
+    .complete-title { font-family: var(--font-display); font-size: 28px; color: var(--text-1); margin-bottom: .625rem; }
+    .complete-body { font-size: 14px; color: var(--text-3); line-height: 1.75; max-width: 480px; margin: 0 auto 2rem; }
+    .btn-return {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--bg-void);
+      background: var(--gold-mid);
+      border: none;
+      padding: .55rem 1.5rem;
+      cursor: pointer;
+      letter-spacing: .06em;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-return:hover { background: var(--gold-bright); }
+
+    /* ── Print layout ─────────────────────────────────────────────────────────── */
+    @media print {
+      .site-header, .survey-nav-bar, .q-nav { display: none; }
+      .survey-wrap { padding: 0; }
+      .survey-screen { display: block !important; }
+      .q-block, .print-summary { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="back-link" href="index.html" style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);text-decoration:none;letter-spacing:.06em;">&#8592; Role Gate</a>
+      <nav class="header-nav">
+        <a href="survivor.html">Personal Safety</a>
+        <a href="advocate.html">Advocate</a>
+        <a href="policy.html">Policy</a>
+        <a href="institutional.html">Institutional</a>
+      </nav>
+      <button class="exit-site-btn" onclick="leaveNow()" aria-label="Exit site immediately">&#9632; Exit Site Now</button>
+    </div>
+  </header>
+
+  <!-- Netlify forms: present in DOM at load time so Netlify's scanner detects them. Never shown to user. -->
+  <div class="netlify-forms" aria-hidden="true">
+    <form name="survey-anonymous" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="survey-anonymous">
+      <input name="bot-field" type="text">
+      <input name="q1_role" type="hidden">
+      <input name="q2_recognized" type="hidden">
+      <input name="q3_duration" type="hidden">
+      <input name="q4_tactics" type="hidden">
+      <input name="q5_workplace_impact" type="hidden">
+      <input name="q6_sought_help" type="hidden">
+      <input name="q7_barriers" type="hidden">
+      <input name="q8_resource_usefulness" type="hidden">
+      <input name="q9_legal_contact" type="hidden">
+      <input name="q10_safety_improved" type="hidden">
+      <input name="q11_dashboard_helpful" type="hidden">
+      <input name="q12_missing_features" type="hidden">
+      <input name="q13_age_range" type="hidden">
+      <input name="q14_open_end" type="hidden">
+    </form>
+    <form name="survey-followup" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="survey-followup">
+      <input name="bot-field" type="text">
+      <input name="q1_role" type="hidden">
+      <input name="q2_recognized" type="hidden">
+      <input name="q3_duration" type="hidden">
+      <input name="q4_tactics" type="hidden">
+      <input name="q5_workplace_impact" type="hidden">
+      <input name="q6_sought_help" type="hidden">
+      <input name="q7_barriers" type="hidden">
+      <input name="q8_resource_usefulness" type="hidden">
+      <input name="q9_legal_contact" type="hidden">
+      <input name="q10_safety_improved" type="hidden">
+      <input name="q11_dashboard_helpful" type="hidden">
+      <input name="q12_missing_features" type="hidden">
+      <input name="q13_age_range" type="hidden">
+      <input name="q14_open_end" type="hidden">
+      <input name="contact_email" type="hidden">
+      <input name="contact_phone" type="hidden">
+      <input name="contact_pref" type="hidden">
+    </form>
+  </div>
+
+  <main class="survey-wrap" id="survey-app">
+
+    <div class="survey-shell">
+
+      <!-- Progress bar -->
+      <div class="progress-bar-wrap" id="progress-wrap" style="display:none;">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="progress-text">1 / 14</div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           SCREEN 1: Consent
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="survey-screen visible" id="screen-consent">
+
+        <div class="consent-header">
+          <div class="consent-label">Experience Survey</div>
+          <h1 class="consent-title">Share Your Experience</h1>
+          <p class="consent-desc">This survey helps us understand how coercive control affects people's lives and how well this resource meets their needs. Your participation is voluntary and anonymous by default.</p>
+        </div>
+
+        <div class="consent-cards">
+          <div class="consent-card">
+            <div class="consent-card-label">What we ask</div>
+            <div class="consent-card-body">14 questions about your experience with coercive control, resources you used, and how helpful this dashboard was. Takes 5–10 minutes.</div>
+          </div>
+          <div class="consent-card">
+            <div class="consent-card-label">What we do with it</div>
+            <div class="consent-card-body">Aggregated results may be published on the Policy page to document patterns and inform advocacy. No individual responses are ever published.</div>
+          </div>
+        </div>
+
+        <div class="privacy-block">
+          <div class="privacy-block-label">Privacy &amp; Safety</div>
+          <div class="privacy-item"><span class="privacy-item-icon">✓</span>No identifying information is collected unless you choose the follow-up path</div>
+          <div class="privacy-item"><span class="privacy-item-icon">✓</span>No cookies, trackers, or analytics on this page</div>
+          <div class="privacy-item"><span class="privacy-item-icon">✓</span>You can skip any question — each is optional</div>
+          <div class="privacy-item"><span class="privacy-item-icon">✓</span>You can stop at any time — no partial data is stored until submission</div>
+          <div class="privacy-item"><span class="privacy-item-icon">✓</span>The Exit Site button (top right) immediately navigates away</div>
+        </div>
+
+        <div class="path-choice">
+          <div class="path-choice-label">Choose how you want to participate</div>
+          <div class="path-cards">
+            <div class="path-card" role="radio" aria-checked="false" tabindex="0" onclick="selectPath('print')" onkeydown="if(event.key==='Enter')selectPath('print')" id="path-print">
+              <div class="path-card-radio"></div>
+              <div class="path-card-body">
+                <div class="path-card-title">Print or save only — no data sent</div>
+                <div class="path-card-desc">Answer questions here, then print or save a PDF copy for your own records. Nothing is transmitted online. Works with no internet connection.</div>
+              </div>
+            </div>
+            <div class="path-card" role="radio" aria-checked="false" tabindex="0" onclick="selectPath('anonymous')" onkeydown="if(event.key==='Enter')selectPath('anonymous')" id="path-anonymous">
+              <div class="path-card-radio"></div>
+              <div class="path-card-body">
+                <div class="path-card-title">Submit anonymously — no contact info</div>
+                <div class="path-card-desc">Your answers are submitted without any identifying information. We cannot contact you and you cannot request deletion of a specific response.</div>
+              </div>
+            </div>
+            <div class="path-card" role="radio" aria-checked="false" tabindex="0" onclick="selectPath('followup')" onkeydown="if(event.key==='Enter')selectPath('followup')" id="path-followup">
+              <div class="path-card-radio"></div>
+              <div class="path-card-body">
+                <div class="path-card-title">Submit with contact info — follow-up optional</div>
+                <div class="path-card-desc">Your answers are submitted with an email or phone you provide. We may reach out to clarify or follow up. You can request deletion of your response at any time.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="q-nav" style="justify-content:flex-end;">
+          <button class="btn-next" id="consent-next-btn" disabled onclick="startSurvey()">Begin Survey &rarr;</button>
+        </div>
+
+      </div><!-- /screen-consent -->
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           SCREEN 2: Questions
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="survey-screen" id="screen-questions">
+        <div id="question-mount"></div>
+        <div class="q-nav">
+          <button class="btn-back" id="q-back-btn" onclick="qNav(-1)">&#8592; Back</button>
+          <button class="btn-next" id="q-next-btn" onclick="qNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           SCREEN 3: Submission
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="survey-screen" id="screen-submit">
+        <div class="submit-header">
+          <div class="submit-title">Review &amp; Submit</div>
+          <p class="submit-desc">Review your answers below. You can go back to change any response before submitting.</p>
+        </div>
+
+        <!-- Print path -->
+        <div class="submit-panel" id="panel-print">
+          <div class="print-summary">
+            <div class="print-summary-label">Your Responses</div>
+            <div id="print-responses"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+            <button class="btn-next" onclick="window.print()">Print / Save PDF</button>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-4);">No data is transmitted</span>
+          </div>
+          <div class="q-nav">
+            <button class="btn-back" onclick="showScreen('screen-questions')">&#8592; Edit Responses</button>
+            <button class="btn-next" onclick="completePrint()">Done</button>
+          </div>
+        </div>
+
+        <!-- Anonymous submission -->
+        <div class="submit-panel" id="panel-anonymous">
+          <div class="print-summary">
+            <div class="print-summary-label">Your Responses — Anonymous</div>
+            <div id="anon-responses"></div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <p style="font-size:12px;color:var(--text-3);line-height:1.6;">Once submitted, this response cannot be individually retracted — no identifying information is stored. Click Submit to send.</p>
+          </div>
+          <div class="q-nav">
+            <button class="btn-back" onclick="showScreen('screen-questions')">&#8592; Edit Responses</button>
+            <button class="btn-next" id="anon-submit-btn" onclick="submitAnonymous()">Submit Anonymously</button>
+          </div>
+        </div>
+
+        <!-- Follow-up submission -->
+        <div class="submit-panel" id="panel-followup">
+          <div class="print-summary">
+            <div class="print-summary-label">Your Responses — With Contact</div>
+            <div id="followup-responses"></div>
+          </div>
+
+          <div style="background:var(--bg-raised);border:1px solid var(--border);padding:1.125rem;margin-bottom:1rem;">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-4);margin-bottom:.875rem;">Contact Information</div>
+            <div style="display:grid;gap:.625rem;">
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);display:block;margin-bottom:.3rem;" for="contact-email">Email (optional)</label>
+                <input type="email" id="contact-email" placeholder="you@example.com" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-1);font-family:var(--font-mono);font-size:12px;padding:.4rem .625rem;">
+              </div>
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);display:block;margin-bottom:.3rem;" for="contact-phone">Phone (optional)</label>
+                <input type="tel" id="contact-phone" placeholder="Optional" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-1);font-family:var(--font-mono);font-size:12px;padding:.4rem .625rem;">
+              </div>
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);display:block;margin-bottom:.3rem;">Preferred contact method</label>
+                <div style="display:flex;gap:.5rem;flex-wrap:wrap;" id="pref-contact-group">
+                  <button type="button" class="pref-btn" data-pref="email" onclick="selectPref(this)">Email</button>
+                  <button type="button" class="pref-btn" data-pref="phone" onclick="selectPref(this)">Phone</button>
+                  <button type="button" class="pref-btn" data-pref="either" onclick="selectPref(this)">Either</button>
+                  <button type="button" class="pref-btn" data-pref="no-contact" onclick="selectPref(this)">No contact</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="q-nav">
+            <button class="btn-back" onclick="showScreen('screen-questions')">&#8592; Edit Responses</button>
+            <button class="btn-next" id="followup-submit-btn" onclick="submitFollowup()">Submit</button>
+          </div>
+        </div>
+      </div><!-- /screen-submit -->
+
+      <!-- Completion -->
+      <div class="complete-panel" id="screen-complete">
+        <div class="complete-mark">✓</div>
+        <div class="complete-title">Thank you</div>
+        <p class="complete-body">Your response has been recorded. Aggregated findings will appear on the Policy page as enough responses are collected to protect individual anonymity.</p>
+        <a class="btn-return" href="index.html">Return to Dashboard</a>
+      </div>
+
+    </div><!-- /survey-shell -->
+  </main>
+
+  <style>
+    .pref-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      padding: .3rem .625rem;
+      cursor: pointer;
+      transition: color .1s, border-color .1s;
+    }
+    .pref-btn:hover { color: var(--gold-mid); border-color: var(--border-gold); }
+    .pref-btn.selected { color: var(--gold-bright); border-color: var(--gold-mid); background: var(--bg-elevated); }
+  </style>
+
+  <script>
+  (() => {
+    'use strict';
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let chosenPath = null;
+    let currentQ = 0;
+    const answers = {};
+
+    // ── Questions definition ──────────────────────────────────────────────────
+    const QUESTIONS = [
+      {
+        id: 'q1_role',
+        type: 'radio',
+        text: 'What is your primary role in relation to coercive control?',
+        context: 'Select the role that best describes why you are using this resource.',
+        options: [
+          { value: 'survivor', label: 'Survivor or person currently experiencing coercive control' },
+          { value: 'advocate', label: 'Advocate, counselor, or support professional' },
+          { value: 'legal', label: 'Attorney, paralegal, or legal services professional' },
+          { value: 'researcher', label: 'Researcher or academic' },
+          { value: 'policy', label: 'Policy professional or legislator' },
+          { value: 'other', label: 'Other' }
+        ]
+      },
+      {
+        id: 'q2_recognized',
+        type: 'radio',
+        text: 'Before using this resource, how well did you understand what coercive control is?',
+        options: [
+          { value: '4', label: 'Very well — I could explain it to others' },
+          { value: '3', label: 'Somewhat — I had a general sense' },
+          { value: '2', label: 'Not well — I had heard the term but wasn\'t sure what it meant' },
+          { value: '1', label: 'Not at all — this was new to me' }
+        ]
+      },
+      {
+        id: 'q3_duration',
+        type: 'radio',
+        text: 'Approximately how long did the coercive control you experienced or are supporting last?',
+        context: 'If supporting others, answer based on the typical situation you encounter.',
+        options: [
+          { value: 'under-6mo', label: 'Less than 6 months' },
+          { value: '6mo-2yr', label: '6 months to 2 years' },
+          { value: '2yr-5yr', label: '2 to 5 years' },
+          { value: 'over-5yr', label: 'More than 5 years' },
+          { value: 'ongoing', label: 'Ongoing' },
+          { value: 'prefer-not', label: 'Prefer not to say' }
+        ]
+      },
+      {
+        id: 'q4_tactics',
+        type: 'checkbox',
+        text: 'Which tactics were present?',
+        context: 'Select all that apply. This helps identify which patterns are most common.',
+        options: [
+          { value: 'isolation', label: 'Isolation from friends, family, or support networks' },
+          { value: 'financial', label: 'Financial control or economic abuse' },
+          { value: 'digital', label: 'Digital surveillance, tracking, or account monitoring' },
+          { value: 'workplace', label: 'Sabotage of employment or education' },
+          { value: 'legal', label: 'Misuse of legal systems (frivolous litigation, custody manipulation)' },
+          { value: 'physical', label: 'Physical violence or threats' },
+          { value: 'sexual', label: 'Sexual coercion' },
+          { value: 'identity', label: 'Immigration status or identity document control' },
+          { value: 'children', label: 'Use of children as leverage' },
+          { value: 'housing', label: 'Housing instability as a control mechanism' }
+        ]
+      },
+      {
+        id: 'q5_workplace_impact',
+        type: 'radio',
+        text: 'Did coercive control affect your employment or education?',
+        options: [
+          { value: 'severe', label: 'Severely — I lost a job, was expelled, or dropped out' },
+          { value: 'significant', label: 'Significantly — my performance or attendance suffered' },
+          { value: 'some', label: 'Somewhat — there were disruptions I managed through' },
+          { value: 'none', label: 'Not at all' },
+          { value: 'na', label: 'Not applicable' }
+        ]
+      },
+      {
+        id: 'q6_sought_help',
+        type: 'checkbox',
+        text: 'What types of help did you or the person you support seek?',
+        context: 'Select all that apply.',
+        options: [
+          { value: 'hotline', label: 'Crisis hotline or text line' },
+          { value: 'shelter', label: 'Domestic violence shelter or safe housing' },
+          { value: 'legal-aid', label: 'Legal aid or attorney' },
+          { value: 'law-enforcement', label: 'Law enforcement or protective order' },
+          { value: 'therapy', label: 'Therapy or counseling' },
+          { value: 'advocate', label: 'DV advocate or case manager' },
+          { value: 'medical', label: 'Medical care' },
+          { value: 'none', label: 'None — help was not sought' }
+        ]
+      },
+      {
+        id: 'q7_barriers',
+        type: 'checkbox',
+        text: 'What barriers made it harder to seek or access help?',
+        context: 'Select all that apply.',
+        options: [
+          { value: 'fear', label: 'Fear of retaliation or escalation' },
+          { value: 'not-believed', label: 'Fear of not being believed' },
+          { value: 'financial', label: 'Financial inability to leave or access services' },
+          { value: 'children', label: 'Children or dependent family members' },
+          { value: 'immigration', label: 'Immigration status' },
+          { value: 'language', label: 'Language barrier' },
+          { value: 'awareness', label: 'Did not know help existed' },
+          { value: 'bias', label: 'Concerns about bias or discrimination in the system' },
+          { value: 'none', label: 'No significant barriers' }
+        ]
+      },
+      {
+        id: 'q8_resource_usefulness',
+        type: 'scale',
+        text: 'How useful were the resources you found — including this dashboard?',
+        labels: ['Not useful', 'Extremely useful'],
+        min: 1,
+        max: 5
+      },
+      {
+        id: 'q9_legal_contact',
+        type: 'radio',
+        text: 'Did you or the person you support make contact with the legal system?',
+        options: [
+          { value: 'criminal', label: 'Yes — criminal proceedings were involved' },
+          { value: 'civil', label: 'Yes — civil or family court only' },
+          { value: 'protective-order', label: 'Yes — protective or restraining order obtained' },
+          { value: 'attempted', label: 'Attempted but encountered barriers' },
+          { value: 'no', label: 'No — did not pursue legal remedies' },
+          { value: 'na', label: 'Not applicable' }
+        ]
+      },
+      {
+        id: 'q10_safety_improved',
+        type: 'radio',
+        text: 'Has your or the supported person\'s safety situation improved?',
+        options: [
+          { value: 'significantly', label: 'Significantly improved' },
+          { value: 'somewhat', label: 'Somewhat improved' },
+          { value: 'unchanged', label: 'About the same' },
+          { value: 'worse', label: 'Worsened' },
+          { value: 'unknown', label: 'Unknown / still in process' },
+          { value: 'prefer-not', label: 'Prefer not to say' }
+        ]
+      },
+      {
+        id: 'q11_dashboard_helpful',
+        type: 'scale',
+        text: 'How helpful was this dashboard specifically?',
+        labels: ['Not helpful', 'Extremely helpful'],
+        min: 1,
+        max: 5
+      },
+      {
+        id: 'q12_missing_features',
+        type: 'checkbox',
+        text: 'What would make this resource more useful?',
+        context: 'Select all that apply.',
+        options: [
+          { value: 'local', label: 'Local shelter and resource directory' },
+          { value: 'translate', label: 'More languages' },
+          { value: 'phone-app', label: 'Mobile app with offline access' },
+          { value: 'professional', label: 'Professional case management tools' },
+          { value: 'court-docs', label: 'Court document templates' },
+          { value: 'training', label: 'Training materials for workplaces or schools' },
+          { value: 'nothing', label: 'Nothing — it met my needs' }
+        ]
+      },
+      {
+        id: 'q13_age_range',
+        type: 'radio',
+        text: 'What is your age range?',
+        context: 'Optional. Helps us understand who this resource reaches.',
+        options: [
+          { value: 'under-25', label: 'Under 25' },
+          { value: '25-34', label: '25–34' },
+          { value: '35-44', label: '35–44' },
+          { value: '45-54', label: '45–54' },
+          { value: '55+', label: '55 or older' },
+          { value: 'prefer-not', label: 'Prefer not to say' }
+        ]
+      },
+      {
+        id: 'q14_open_end',
+        type: 'textarea',
+        text: 'Is there anything else you want us to know?',
+        context: 'Optional. Share anything about your experience, what helped, what didn\'t, or what you wish existed.',
+        placeholder: 'Share anything — or leave blank and continue.'
+      }
+    ];
+
+    const TOTAL = QUESTIONS.length;
+
+    // ── Path selection ────────────────────────────────────────────────────────
+    window.selectPath = function(path) {
+      chosenPath = path;
+      ['print','anonymous','followup'].forEach(p => {
+        const card = document.getElementById('path-' + p);
+        if (!card) return;
+        card.classList.toggle('selected', p === path);
+        card.setAttribute('aria-checked', p === path ? 'true' : 'false');
+      });
+      document.getElementById('consent-next-btn').disabled = false;
+    };
+
+    window.startSurvey = function() {
+      if (!chosenPath) return;
+      currentQ = 0;
+      renderQuestion();
+      showScreen('screen-questions');
+      document.getElementById('progress-wrap').style.display = 'flex';
+    };
+
+    // ── Screen management ─────────────────────────────────────────────────────
+    window.showScreen = function(id) {
+      document.querySelectorAll('.survey-screen').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.complete-panel').forEach(el => el.classList.remove('visible'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('visible');
+    };
+
+    // ── Question renderer ─────────────────────────────────────────────────────
+    function renderQuestion() {
+      const q = QUESTIONS[currentQ];
+      const mount = document.getElementById('question-mount');
+      while (mount.firstChild) mount.removeChild(mount.firstChild);
+      updateProgress();
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'q-header';
+      const numEl = document.createElement('span');
+      numEl.className = 'q-number';
+      numEl.textContent = String(currentQ + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+      header.appendChild(numEl);
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'q-skip';
+      skipBtn.textContent = 'Skip this question';
+      skipBtn.onclick = function() { qNav(1); };
+      header.appendChild(skipBtn);
+      mount.appendChild(header);
+
+      // Block
+      const block = document.createElement('div');
+      block.className = 'q-block';
+
+      const qText = document.createElement('p');
+      qText.className = 'q-text';
+      qText.textContent = q.text;
+      block.appendChild(qText);
+
+      if (q.context) {
+        const ctx = document.createElement('p');
+        ctx.className = 'q-context';
+        ctx.textContent = q.context;
+        block.appendChild(ctx);
+      }
+
+      // Input
+      if (q.type === 'radio' || q.type === 'checkbox') {
+        const optWrap = document.createElement('div');
+        optWrap.className = 'q-options';
+        optWrap.setAttribute('role', q.type === 'radio' ? 'radiogroup' : 'group');
+
+        (q.options || []).forEach(opt => {
+          const isMulti = q.type === 'checkbox';
+          const stored = answers[q.id] || (isMulti ? [] : null);
+          const isSelected = isMulti ? stored.includes(opt.value) : stored === opt.value;
+
+          const row = document.createElement('label');
+          row.className = 'q-opt' + (isSelected ? ' selected' : '');
+
+          const input = document.createElement('input');
+          input.type = q.type;
+          input.name = q.id;
+          input.value = opt.value;
+          if (isSelected) input.checked = true;
+          input.onchange = function() {
+            if (isMulti) {
+              let arr = answers[q.id] ? [...answers[q.id]] : [];
+              if (input.checked) { if (!arr.includes(opt.value)) arr.push(opt.value); }
+              else { arr = arr.filter(v => v !== opt.value); }
+              answers[q.id] = arr;
+            } else {
+              answers[q.id] = opt.value;
+              document.querySelectorAll('label.q-opt').forEach(l => l.classList.remove('selected'));
+            }
+            row.classList.toggle('selected', input.checked);
+          };
+          row.appendChild(input);
+
+          const indicator = document.createElement('span');
+          indicator.className = 'q-opt-indicator ' + (isMulti ? 'square' : 'circle');
+          row.appendChild(indicator);
+
+          const labelEl = document.createElement('span');
+          labelEl.className = 'q-opt-label';
+          labelEl.textContent = opt.label;
+          row.appendChild(labelEl);
+
+          optWrap.appendChild(row);
+        });
+
+        block.appendChild(optWrap);
+
+      } else if (q.type === 'scale') {
+        const scaleWrap = document.createElement('div');
+        scaleWrap.className = 'q-scale';
+
+        const labelRow = document.createElement('div');
+        labelRow.className = 'q-scale-label-row';
+        const leftLbl = document.createElement('span');
+        leftLbl.textContent = (q.labels || [''])[0];
+        const rightLbl = document.createElement('span');
+        rightLbl.textContent = (q.labels || ['',''])[1];
+        labelRow.appendChild(leftLbl);
+        labelRow.appendChild(rightLbl);
+        scaleWrap.appendChild(labelRow);
+
+        for (let i = q.min; i <= q.max; i++) {
+          const stored = answers[q.id];
+          const isSelected = String(stored) === String(i);
+
+          const optRow = document.createElement('label');
+          optRow.className = 'q-scale-opt' + (isSelected ? ' selected' : '');
+
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = q.id;
+          input.value = String(i);
+          if (isSelected) input.checked = true;
+          const val = i;
+          input.onchange = function() {
+            answers[q.id] = val;
+            document.querySelectorAll('label.q-scale-opt').forEach(l => l.classList.remove('selected'));
+            optRow.classList.add('selected');
+          };
+          optRow.appendChild(input);
+
+          const numEl = document.createElement('span');
+          numEl.className = 'q-scale-num';
+          numEl.textContent = String(i);
+          optRow.appendChild(numEl);
+
+          const desc = document.createElement('span');
+          desc.style.cssText = 'font-size:13px;color:var(--text-3);';
+          const pct = ((i - q.min) / (q.max - q.min)) * 100;
+          if (pct <= 25) desc.textContent = (q.labels || [''])[0];
+          else if (pct >= 75) desc.textContent = (q.labels || ['',''])[1];
+          optRow.appendChild(desc);
+
+          scaleWrap.appendChild(optRow);
+        }
+        block.appendChild(scaleWrap);
+
+      } else if (q.type === 'textarea') {
+        const ta = document.createElement('textarea');
+        ta.className = 'q-textarea';
+        ta.placeholder = q.placeholder || '';
+        ta.value = answers[q.id] || '';
+        ta.setAttribute('rows', '5');
+        ta.oninput = function() { answers[q.id] = ta.value; };
+        block.appendChild(ta);
+      }
+
+      mount.appendChild(block);
+
+      // Update nav buttons
+      document.getElementById('q-back-btn').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+      const nextBtn = document.getElementById('q-next-btn');
+      nextBtn.textContent = currentQ === TOTAL - 1 ? 'Review →' : 'Next →';
+    }
+
+    function updateProgress() {
+      const pct = Math.round(((currentQ + 1) / TOTAL) * 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = (currentQ + 1) + ' / ' + TOTAL;
+    }
+
+    window.qNav = function(dir) {
+      const next = currentQ + dir;
+      if (next < 0) return;
+      if (next >= TOTAL) {
+        buildSubmitScreen();
+        showScreen('screen-submit');
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('progress-text').textContent = 'Review';
+        return;
+      }
+      currentQ = next;
+      renderQuestion();
+    };
+
+    // ── Submit screen builder ─────────────────────────────────────────────────
+    function buildSubmitScreen() {
+      ['panel-print','panel-anonymous','panel-followup'].forEach(id => {
+        document.getElementById(id).classList.remove('visible');
+      });
+
+      const panelId = { print: 'panel-print', anonymous: 'panel-anonymous', followup: 'panel-followup' }[chosenPath];
+      const responseContainerId = { print: 'print-responses', anonymous: 'anon-responses', followup: 'followup-responses' }[chosenPath];
+
+      document.getElementById(panelId).classList.add('visible');
+
+      // Build response list
+      const container = document.getElementById(responseContainerId);
+      while (container.firstChild) container.removeChild(container.firstChild);
+
+      QUESTIONS.forEach(q => {
+        const val = answers[q.id];
+        if (!val || (Array.isArray(val) && !val.length) || val === '') return;
+
+        const item = document.createElement('div');
+        item.className = 'print-response';
+
+        const qEl = document.createElement('div');
+        qEl.className = 'print-q';
+        qEl.textContent = q.text;
+        item.appendChild(qEl);
+
+        const aEl = document.createElement('div');
+        aEl.className = 'print-a';
+
+        if (q.type === 'radio' || q.type === 'scale') {
+          const opt = (q.options || []).find(o => String(o.value) === String(val));
+          aEl.textContent = opt ? opt.label : String(val);
+        } else if (q.type === 'checkbox') {
+          const labels = (val || []).map(v => {
+            const o = (q.options || []).find(x => x.value === v);
+            return o ? o.label : v;
+          });
+          aEl.textContent = labels.join('; ');
+        } else {
+          aEl.textContent = String(val);
+        }
+
+        item.appendChild(aEl);
+        container.appendChild(item);
+      });
+    }
+
+    // ── Print completion ──────────────────────────────────────────────────────
+    window.completePrint = function() {
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.querySelectorAll('.survey-screen').forEach(el => el.classList.remove('visible'));
+      document.getElementById('screen-complete').classList.add('visible');
+    };
+
+    // ── Anonymous submission ──────────────────────────────────────────────────
+    window.submitAnonymous = function() {
+      const btn = document.getElementById('anon-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const form = document.querySelector('form[name="survey-anonymous"]');
+      const data = new FormData(form);
+      data.set('form-name', 'survey-anonymous');
+      QUESTIONS.forEach(q => {
+        const val = answers[q.id];
+        if (val === undefined || val === null || val === '') return;
+        const v = Array.isArray(val) ? val.join(', ') : String(val);
+        data.set(q.id, v);
+      });
+
+      fetch('/', { method: 'POST', body: data })
+        .then(() => { showComplete(); })
+        .catch(() => {
+          btn.disabled = false;
+          btn.textContent = 'Submit Anonymously';
+          const err = document.createElement('p');
+          err.style.cssText = 'font-size:12px;color:var(--none-fg);margin-top:.5rem;';
+          err.textContent = 'Submission failed. Check your connection and try again, or use the Print option instead.';
+          btn.parentElement.appendChild(err);
+        });
+    };
+
+    // ── Follow-up submission ──────────────────────────────────────────────────
+    let selectedPref = null;
+    window.selectPref = function(el) {
+      selectedPref = el.getAttribute('data-pref');
+      document.querySelectorAll('.pref-btn').forEach(b => b.classList.toggle('selected', b === el));
+    };
+
+    window.submitFollowup = function() {
+      const btn = document.getElementById('followup-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const email = document.getElementById('contact-email').value;
+      const phone = document.getElementById('contact-phone').value;
+
+      const form = document.querySelector('form[name="survey-followup"]');
+      const data = new FormData(form);
+      data.set('form-name', 'survey-followup');
+      QUESTIONS.forEach(q => {
+        const val = answers[q.id];
+        if (val === undefined || val === null || val === '') return;
+        const v = Array.isArray(val) ? val.join(', ') : String(val);
+        data.set(q.id, v);
+      });
+      if (email) data.set('contact_email', email);
+      if (phone) data.set('contact_phone', phone);
+      if (selectedPref) data.set('contact_pref', selectedPref);
+
+      fetch('/', { method: 'POST', body: data })
+        .then(() => { showComplete(); })
+        .catch(() => {
+          btn.disabled = false;
+          btn.textContent = 'Submit';
+          const err = document.createElement('p');
+          err.style.cssText = 'font-size:12px;color:var(--none-fg);margin-top:.5rem;';
+          err.textContent = 'Submission failed. Check your connection and try again.';
+          btn.parentElement.appendChild(err);
+        });
+    };
+
+    function showComplete() {
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.querySelectorAll('.survey-screen').forEach(el => el.classList.remove('visible'));
+      document.getElementById('screen-complete').classList.add('visible');
+    }
+
+  })();
+
+  function leaveNow() { window.location.replace('https://www.google.com'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') leaveNow(); });
+  </script>
+</body>
+</html>

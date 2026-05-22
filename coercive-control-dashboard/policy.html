@@ -138,6 +138,7 @@
         <a href="policy.html" class="active">Policy</a>
         <a href="institutional.html">Institutional</a>
       </nav>
+      <button class="exit-site-btn" onclick="leaveNow()" aria-label="Exit site immediately">&#9632; Exit Site Now</button>
     </div>
   </header>
 
@@ -658,6 +659,9 @@
 
     init();
   })();
+
+  function leaveNow() { window.location.replace('https://www.google.com'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') leaveNow(); });
   </script>
 </body>
 </html>
