@@ -1,17 +1,3 @@
-#----- Libraries -----
-require(scales)
-require(patchwork)
-require(cowplot)
-require(spdep)
-require(ggnewscale)
-require(parallel)
-suppressPackageStartupMessages(require(spatstat))
-require(sf)
-require(tidyverse)
-require(nimble)
-require(lme4)
-require(FNN)
-
 #----- MCMC Arguments -----
 niter <- 150000
 nburnin <- 0.5*niter
@@ -23,14 +9,6 @@ y_rng <- window$yrange
 intpoint_knot_ratio <- 17
 
 plt_style <- list(x = 0.65, size = 25, hjust = 0, vjust = 1, fontface = 'bold')
-
-#----- Functions -----
-# Exponential correlation function
-exp_corr <- function(dists, phi) {
-  temp <- exp(-dists * phi)
-  attr(temp, 'dimnames') <- NULL
-  temp
-}
 
 #----- Model -----
 model_code <- nimbleCode({
@@ -69,7 +47,7 @@ model_code <- nimbleCode({
     eta_loc[k]   <- Xbeta_loc[k] + W1_loc[k] + log_pop_dens[k]
   }
   
-  ## Iintegration point unique locations
+  ## Integration point unique locations
   for(k in 1:n_A) {
     W1_loc_ips[k]   <- sigma * inprod(C_cross_C_inv_int_1[k,1:n_K], W1star_c[1:n_K])
     
@@ -80,20 +58,20 @@ model_code <- nimbleCode({
   # Observed-point likelihood
   for(i in 1:n_points) {
     # Intensity model
-    log(lambda[i]) <- eta_loc[loc[i]] + delta_1[year[i]]
+    log(lambda[i]) <- eta_loc[loc[i]] + delta_1[period[i]]
     
     # Mark model
     Y[i] ~ dbin(prob = pi[i], size = 1)
-    logit(pi[i]) <- inprod(X_mark[i, 1:p_mark], gamma[1:p_mark]) + delta_2[year[i]]
+    logit(pi[i]) <- inprod(X_mark[i, 1:p_mark], gamma[1:p_mark]) + delta_2[period[i]]
   }
   
   # Integration points
   for(j in 1:n_V) {
     # Intensity model
-    log(lambda_sV[j]) <- eta_loc_ips[loc_V[j]] + delta_1[year_V[j]]
+    log(lambda_sV[j]) <- eta_loc_ips[loc_V[j]] + delta_1[period_V[j]]
     
     # Mark model
-    logit(pi_V[j])    <- inprod(X_mark_V[j, 1:p_mark], gamma[1:p_mark]) + delta_2[year_V[j]]
+    logit(pi_V[j])    <- inprod(X_mark_V[j, 1:p_mark], gamma[1:p_mark]) + delta_2[period_V[j]]
     
     # Posterior surfaces
     lambda_sV_dom[j]    <- lambda_sV[j] * pi_V[j]
@@ -101,13 +79,13 @@ model_code <- nimbleCode({
   }
 
   # Temporal random effects
-  for(t in 1:n_years) {
+  for(t in 1:n_periods) {
     u1[t] ~ dnorm(0, sd = 1)
     u2[t] ~ dnorm(0, sd = 1)
   }
-  mean_u1 <- mean(u1[1:n_years])
-  mean_u2 <- mean(u2[1:n_years])
-  for(t in 1:n_years) {
+  mean_u1 <- mean(u1[1:n_periods])
+  mean_u2 <- mean(u2[1:n_periods])
+  for(t in 1:n_periods) {
     u1_c[t] <- u1[t] - mean_u1
     u2_c[t] <- u2[t] - mean_u2
     
@@ -136,7 +114,7 @@ MPLS_crime <- read_csv('data/MPLS_crime.csv')
 MPLS_crime_sf <- st_as_sf(MPLS_crime, 
                           coords = c('x','y'), 
                           crs=crs_use) %>%
-  mutate(year = factor(year),
+  mutate(period = factor(period),
          GEOID = factor(GEOID)) 
 
 #----- Point Processes -----
@@ -144,7 +122,7 @@ MPLS_crime_sf <- st_as_sf(MPLS_crime,
 assaults_ppp <- as.ppp(st_filter(MPLS_crime_sf, window_sf), W = window)
 
 marks(assaults_ppp) <- with(st_filter(MPLS_crime_sf, window_sf), 
-                            data.frame(Y = Y, year = year))
+                            data.frame(Y = Y, period = period))
 
 # Point process for domestic
 dom_ppp <- as.ppp(subset(assaults_ppp, marks(assaults_ppp)$Y == 1),
@@ -155,24 +133,16 @@ nondom_ppp <- as.ppp(subset(assaults_ppp, marks(assaults_ppp)$Y == 0),
                      W = window)
 
 # Densities
-dens_dom <- density.ppp(subset(dom_ppp, marks(dom_ppp)$year == '2021'))
-dens_nondom <- density.ppp(subset(nondom_ppp, marks(nondom_ppp)$year == '2021')) # Fix
+dens_dom <- density.ppp(subset(dom_ppp, marks(dom_ppp)$period == '2021'))
+dens_nondom <- density.ppp(subset(nondom_ppp, marks(nondom_ppp)$period == '2021')) # Fix
 jsd_im(dens_dom, dens_nondom)
 
-
-#L_dom <- envelope(subset(dom_ppp, marks(dom_ppp) == '2021'), Lest, nsim = 10)
-#plot(L_dom)
-
-#L_nondom <- envelope(subset(nondom_ppp, marks(nondom_ppp) == '2021'), Lest, nsim = 10)
-#plot(L_nondom)
 
 #----- GP -----
 ##----- Knots -----
 # Build a coarse, regular grid at spacing ≈ r
-phi0 <- 170/100            
-r       <- 3 / phi0 
-dx <- r
-dy <- r
+phi0 <- 170/100
+r       <- 3 / phi0
 
 coarse_grid <- expand.grid(
   x = seq(x_rng[1], x_rng[2], by=0.5),
@@ -382,7 +352,7 @@ keep_sf <- clipped %>%
 clipped2 <- bind_rows(rescue_sf, keep_sf) %>%
   mutate(centroid = st_centroid(geometry)) %>%
   filter(
-    lengths(st_intersects(centroid, main_land)) > 0 | touches_bridge == T
+    lengths(st_intersects(centroid, main_land)) > 0 | touches_bridge
   )
 
 ## Get centroids and pull out x,y,E_V into a plain tibble
@@ -396,8 +366,8 @@ ips_locs <- clipped2 %>%
   ) %>%
   st_drop_geometry()
 
-# Expand integration point grid by year
-ips <- expand_grid(ips_locs, year = years_fac) %>%
+# Expand integration point grid by period
+ips <- expand_grid(ips_locs, period = periods_fac) %>%
   mutate(loc_V = row_number())
 
 ## Join *every* crime‐point to its containing grid cell
@@ -409,16 +379,16 @@ events_with_cell <- st_join(
 ) %>%
   st_drop_geometry() %>%
   mutate(
-    # find the row in `ips` for this (grid_id, year)
+    # find the row in `ips` for this (grid_id, period)
     loc = match(
-      paste0(grid_id, "_", year),
-      paste0(ips$grid_id, "_", ips$year)
+      paste0(grid_id, "_", period),
+      paste0(ips$grid_id, "_", ips$period)
     )
   )
 
-## Aggregate at each cell×year
+## Aggregate at each cell×period
 counts_df <- events_with_cell %>%
-  group_by(grid_id, year) %>%
+  group_by(grid_id, period) %>%
   summarise(
     N = sum(N),
     Y = sum(Y),   
@@ -428,7 +398,7 @@ counts_df <- events_with_cell %>%
 
 ## Attach those counts back to `ips` (zero if none)
 ips <- ips %>%
-  left_join(counts_df, by = c("grid_id","year")) %>%
+  left_join(counts_df, by = c("grid_id","period")) %>%
   mutate(
     N = replace_na(N, 0),
     Y = replace_na(Y, 0),
@@ -440,11 +410,11 @@ ips_sf <- st_as_sf(ips, coords = c('x','y'), crs = st_crs(MPLS_crime_sf))
 # Spatially join each centroid to the one (and only one) patch polygon
 # Then join the summary‐columns *into* clipped2, but with the GIS operation:
 ips_sf <- clipped2 %>% 
-  # Cross each patch‐polygon with each year
-  expand_grid(year = years_fac) %>%
+  # Cross each patch‐polygon with each period
+  expand_grid(period = periods_fac) %>%
   
-  # Join counts by grid_id & year
-  left_join(counts_df, by = c("grid_id","year")) %>%
+  # Join counts by grid_id & period
+  left_join(counts_df, by = c("grid_id","period")) %>%
   mutate(
     N             = replace_na(N, 0),
     Y             = replace_na(Y, 0),
@@ -471,9 +441,9 @@ ips_locs <- ips %>% distinct(centroid) %>%
 # Some summaries
 n_A <- nrow(ips_locs)
 n_V <- nrow(ips)
-A_diff <- 100*(sum(ips$clipped_area)/3-A)/A
-sprintf('# of integration points (per year): n_A = %d', n_A)
-sprintf('# of integration points (across years): n_V = %d', n_V)
+A_diff <- 100*(sum(ips$clipped_area)/length(periods)-A)/A
+sprintf('# of integration points (per period): n_A = %d', n_A)
+sprintf('# of integration points (across periods): n_V = %d', n_V)
 sprintf('R = n_A:n = %f', n_A/n_K)
 sprintf('%% Diff between A=|D| and area of integration points: %.2f %%', 
         A_diff)
@@ -487,13 +457,13 @@ dx <- mean(diff(sort(unique(ips$x))))
 dy <- mean(diff(sort(unique(ips$y))))
 d  <- med_knot_dist/2
 
-for(t in years) {
-  # Subset the integration points in year t
-  ips_t   <- ips_sf %>% filter(year == t)
+for(t in periods) {
+  # Subset the integration points in period t
+  ips_t   <- ips_sf %>% filter(period == t)
   ids_t   <- ips_t$loc_V
   coords  <- st_coordinates(ips_t$centroid)
   
-  # Precompute pairwise distances among the ips for year t
+  # Precompute pairwise distances among the ips for period t
   Dmat <- as.matrix(dist(coords))
   
   for(ii in seq_along(ids_t)) {
@@ -543,16 +513,16 @@ ips_sf <- st_join(
 ips <- st_drop_geometry(ips_sf)
 
 MPLS_crime_sf <- MPLS_crime_sf %>%
-  mutate(temp_year = year) %>%
-  select(-year, -domestic_flag) %>%
+  mutate(temp_period = period) %>%
+  select(-period, -domestic_flag) %>%
   st_join(
-    ips_sf %>% select(grid_id, year, domestic_flag, pop),
+    ips_sf %>% select(grid_id, period, domestic_flag, pop),
     join = st_within,    
     left = FALSE,         # drop crimes outside all cells
-    by = 'year'
+    by = 'period'
   ) %>%
-  filter(year == temp_year) %>%
-  select(Precinct, Ward, GEOID, grid_id, year, Case_Number, Type, 
+  filter(period == temp_period) %>%
+  select(Precinct, Ward, GEOID, grid_id, period, Case_Number, Type, 
          Offense_Category, Offense, Y, pop, pop_dens, pct_pov, domestic_flag)
 
 
@@ -616,17 +586,17 @@ n_A <- length(unique(ips_sf$centroid))
 n_V <- length(ips_sf$centroid)
 
 #-----Visualizations -----
-##----- Map of observed assaults aggragated by integration point -----
+##----- Map of observed assaults aggregated by integration point -----
 plt <- ggplot() +
-  facet_wrap(~year) +
+  facet_wrap(~period) +
   geom_sf(data = ips_sf, aes(fill = N), color = NA, size = 0) +
   #geom_sf(data = my_acs, linewidth = 0.5, fill = adjustcolor('white', alpha = 0)) +
   geom_sf(data = st_buffer(water_sf, dist = 0.07), linewidth = 0.5, color = 'black', 
           fill = 'steelblue', alpha = 1) +
-  geom_sf(data = filter(ips_sf, touches_bridge==T), aes(fill = N), color = NA, size = 0) +
-  geom_sf(data = st_buffer(roads_sf, dist = 0.02), linewidth = 0.3, color = 'black', 
+  geom_sf(data = filter(ips_sf, touches_bridge), aes(fill = N), color = NA, size = 0) +
+  geom_sf(data = st_buffer(roads_sf, dist = 0.02), linewidth = 0.3, color = 'black',
           fill = 'darkgreen', alpha = 1) +
-  geom_sf(data = st_buffer(mainroads_sf, dist = 0.07), linewidth = 0.5, color = 'black', 
+  geom_sf(data = st_buffer(mainroads_sf, dist = 0.07), linewidth = 0.5, color = 'black',
           fill = 'darkgreen', alpha = 1) +
   scale_fill_viridis_c(name = 'Number of Assaults',
                        option = 'inferno') +
@@ -668,7 +638,7 @@ p1 <- plot_covariate_map("domestic_flag", ips_sf,
                          title = "% of Calls that Indicate Domestic",
                          legend_title = "% of Calls",
                          fill_option = "inferno",
-                         facet_year = TRUE)
+                         facet_period = TRUE)
 
 p2 <- plot_covariate_map("dist_police", ips_sf,
                          title = "Distance from Nearest Police Station",
@@ -691,10 +661,10 @@ print(plt)
 
 # Thin points for plotting purposes
 obs_pp <- MPLS_crime_sf %>%
-  group_by(geometry, year, Offense) %>%
+  group_by(geometry, period, Offense) %>%
   summarise(N = n()) %>%
   ungroup() %>%
-  group_by(year, Offense) %>%
+  group_by(period, Offense) %>%
   slice_sample(prop = 1) %>% 
   ungroup()
 
@@ -710,7 +680,7 @@ plt <- ggplot() +
   geom_sf(aes(), data = my_acs, color = 'black', linewidth = 1, fill = 'white', inherit.aes = FALSE) + 
   geom_sf(data = st_buffer(water_sf, dist = 0.05), linewidth = 1.3, fill = 'steelblue', alpha = 1) +
   # observed points
-  geom_point(data = filter (obs_pp, year %in% c('2020', '2021', '2022')),
+  geom_point(data = filter(obs_pp, period %in% periods),
              aes(x = x, y = y),
              color = 'black', size = 2, alpha = 1) +
   
@@ -748,9 +718,9 @@ print(plt)
 
 #---- Hyperparameter Estimation -----
 ##---- Design Matrices -----
-covariates_int <- c('dist_water')
-covariates_mark <- c('dist_water','domestic_flag')
-intercept <- T
+covariates_int  <- c('dist_water', 'domestic_flag')
+covariates_mark <- c('dist_water')
+intercept <- TRUE
 MPLS_crime <- st_drop_geometry(MPLS_crime_sf)
 
 # design matrix for covariates for observed data and integration points
@@ -760,22 +730,25 @@ X_mark_V <- as.matrix(ips[,covariates_mark])
 X_int <- as.matrix(MPLS_crime[,covariates_int])
 X_int_V <- as.matrix(ips[,covariates_int])
 
-X_mark <- scale(X_mark, center = T, scale = T)
-X_mark_V <- scale(X_mark_V, center = T, scale = T)
+X_mark_scaled <- scale(X_mark, center = TRUE, scale = TRUE)
+X_mark        <- X_mark_scaled
+X_mark_V      <- scale(X_mark_V,
+                        center = attr(X_mark_scaled, "scaled:center"),
+                        scale  = attr(X_mark_scaled, "scaled:scale"))
 
-ips$X_int_c <- scale(X_int_V, center = T, scale = T)
+ips$X_int_c <- scale(X_int_V, center = TRUE, scale = TRUE)
 
-if(intercept == T) {
+if(intercept) {
   X_int <- cbind(1, X_int)
   X_int_V <- cbind(1, X_int_V)
   X_mark <- cbind(1, X_mark)
   X_mark_V <- cbind(1, X_mark_V)
   
-  f_int <- formula(N ~ X_int_c + (1|year) + offset(1*(log(pop_dens/mean(pop_dens)))))
-  f_mark <- formula(cbind(Y, N-Y) ~ (1|year) + X_mark)
+  f_int <- formula(N ~ X_int_c + (1|period) + offset(1*(log(pop_dens/mean(pop_dens)))))
+  f_mark <- formula(cbind(Y, N-Y) ~ (1|period) + X_mark)
 } else {
-  f_int <- formula(N ~ 0 + X_int_c + (1|year) + offset(1*(log(pop_dens/mean(pop_dens)))))
-  f_mark <- formula(cbind(Y, N-Y) ~ 0 + (1|year) + X_mark)
+  f_int <- formula(N ~ 0 + X_int_c + (1|period) + offset(1*(log(pop_dens/mean(pop_dens)))))
+  f_mark <- formula(cbind(Y, N-Y) ~ 0 + (1|period) + X_mark)
 }
 
 MPLS_crime$X_int <- X_int
@@ -813,7 +786,7 @@ sigma1_hat <- sqrt(psill_spatial)
 glmm_summ <- summary(int_mod)
 glmm_summ
 
-if(intercept == T) {
+if(intercept) {
   if(p_int==2) {
     beta_names <- c("(Intercept)", "X_int_c")
   } else {
@@ -837,8 +810,8 @@ dimnames(cov_beta) <- list(
 # Frequentist estimates
 beta_MLE <- glmm_summ$coefficients[,1]
 SE_beta_MLE <- glmm_summ$coefficients[,2]
-tau1_hat <- as.numeric(sqrt(VarCorr(int_mod)$year))
-delta_1_MLE <- ranef(int_mod)$year$`(Intercept)`
+tau1_hat <- as.numeric(sqrt(VarCorr(int_mod)$period))
+delta_1_MLE <- ranef(int_mod)$period$`(Intercept)`
 
 
 # Hyperparameter Empirical Bayes
@@ -863,7 +836,7 @@ plot(vg_emp, vg_fit, main = "Empirical & Fitted Variogram")
 glmm_summ <- summary(mark_mod)
 glmm_summ
 
-if(intercept == T) {
+if(intercept) {
     gamma_names <- c("(Intercept)", paste0("X_mark", covariates_mark))
 } else {
   if(p_mark==1) {
@@ -881,10 +854,10 @@ dimnames(cov_gamma) <- list(
 )
 
 # Frequentist estimates
-tau2_hat <- as.numeric(sqrt(VarCorr(mark_mod)$year))
+tau2_hat <- as.numeric(sqrt(VarCorr(mark_mod)$period))
 gamma_MLE <- glmm_summ$coefficients[,1]
 SE_gamma_MLE <- glmm_summ$coefficients[,2]
-delta_2_MLE <- ranef(mark_mod)$year$`(Intercept)`
+delta_2_MLE <- ranef(mark_mod)$period$`(Intercept)`
 
 # Hyperparameter Empirical Bayes
 m_gamma   <- mean(gamma_MLE)            # should be ~ mu_gamma
@@ -912,7 +885,6 @@ nu_log_tau <- sqrt(pmax(var_log_tau, 1e-8))
 
 #-----NIMBLE Data Structures-----
 ## ----- GP Covariance -----
-phi_1 <- phi_1 
 
 # Observed
 MPLS_crime_sf$X_int <- MPLS_crime$X_int
@@ -937,12 +909,18 @@ loc_V_idx  <- match(
   paste0(ips_loc$x, '-', ips_loc$y)
 )
 
-if(intercept == T) {
-  obs_coords$X_int <- cbind(1, scale(obs_coords$X_int[,-1], scale = T))
-  ips_loc$X_int <- cbind(1, scale(ips_loc$X_int[,-1], scale = T))
+if(intercept) {
+  obs_X_int_scaled  <- scale(obs_coords$X_int[,-1], scale = TRUE)
+  obs_coords$X_int  <- cbind(1, obs_X_int_scaled)
+  ips_loc$X_int     <- cbind(1, scale(ips_loc$X_int[,-1],
+                                       center = attr(obs_X_int_scaled, "scaled:center"),
+                                       scale  = attr(obs_X_int_scaled, "scaled:scale")))
 } else {
-  obs_coords$X_int <- scale(obs_coords$X_int, scale = T)
-  ips_loc$X_int <- scale(ips_loc$X_int, scale = T)
+  obs_X_int_scaled <- scale(obs_coords$X_int, scale = TRUE)
+  obs_coords$X_int <- obs_X_int_scaled
+  ips_loc$X_int    <- scale(ips_loc$X_int,
+                             center = attr(obs_X_int_scaled, "scaled:center"),
+                             scale  = attr(obs_X_int_scaled, "scaled:scale"))
 }
 
 # Distance calculations
@@ -984,9 +962,8 @@ GP_check <- check_gp_covariate_collinearity(C_cross_C_inv_obs_1, obs_coords$X_in
                                             threshold = 0.4, 
                                             title = "GP Basis: Problematic Knots Highlighted")
 
-year_idx <- as.integer(as.factor(MPLS_crime_sf$year))
-n_years <- length(unique(year_idx)) 
-loc_idx <- as.integer(as.factor(st_as_text(MPLS_crime_sf$geometry)))
+period_idx <- as.integer(as.factor(MPLS_crime_sf$period))
+n_periods <- length(unique(period_idx))
 
 
 
@@ -1007,14 +984,14 @@ data_list <- list(
 constants_list <- list(
   loc         = loc_idx,
   loc_V       = loc_V_idx,
-  year = year_idx,
-  year_V = as.integer(as.factor(ips$year)),
+  period = period_idx,
+  period_V = as.integer(as.factor(ips$period)),
   n_points    = nrow(MPLS_crime_sf),
   n_locations = nrow(obs_coords),
   n_A         = n_A,
   n_V         = n_V,
   n_K         = n_K,
-  n_years     = n_years,
+  n_periods     = n_periods,
   L1 = L1,
   C_cross_C_inv_obs_1 = C_cross_C_inv_obs_1,
   C_cross_C_inv_int_1 = C_cross_C_inv_int_1,
@@ -1053,7 +1030,7 @@ knot_problem <- visualize_problematic_knots(samples_comb = samples_comb, knots =
 cl <- makeCluster(nchains)
 
 # Export necessVry objects to each worker
-clusterExport(cl, c('model_code', 'data_list', 'constants_list', 'niter', 'n_years',
+clusterExport(cl, c('model_code', 'data_list', 'constants_list', 'niter', 'n_periods',
                     'n_K', 'p_int', 'p_mark', 
                     'nburnin', 'thin', 'knots', 'beta_MLE', 'cov_GP', 'cov_beta', 'cov_gamma', 'delta_2_MLE', 'delta_2_MLE',
                     'gamma_MLE'))
@@ -1193,8 +1170,8 @@ rm(samples_list)
 # Parameter names
 params_beta <- paste0('beta[', 1:p_int, ']')
 params_gamma <- paste0('gamma[', 1:p_mark, ']')
-params_delta <- c(paste0( 'delta_1[', 1:n_years, ']'), 
-                  paste0('delta_2[', 1:n_years, ']')
+params_delta <- c(paste0( 'delta_1[', 1:n_periods, ']'), 
+                  paste0('delta_2[', 1:n_periods, ']')
                   )
 params_varcomp <- c('sigma', # 'sigma[2]', 
                     'tau[1]', 'tau[2]')
@@ -1235,9 +1212,9 @@ saveRDS(
     model_summary   = model_summary,
     p_int           = p_int,
     p_mark          = p_mark,
-    n_years         = n_years,
-    covariates_int  = c("intercept", "dist_water"),
-    covariates_mark = c("intercept", "dist_water", "domestic_flag")
+    n_periods         = n_periods,
+    covariates_int  = c("intercept", "dist_water", "domestic_flag"),
+    covariates_mark = c("intercept", "dist_water")
   ),
   file = 'output/lgcp_posterior.rds'
 )

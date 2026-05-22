@@ -100,8 +100,9 @@ crime_data <- crime_data %>%
   mutate(
     occurred_datetime = as.POSIXct(Occurred_Date / 1000, origin = "1970-01-01", tz = "UTC"),
     occurred_date = format(occurred_datetime, "%Y-%m-%d"),
-    year = format(occurred_datetime, "%Y")) %>%
-  filter(year %in% years)
+    period = paste0(format(occurred_datetime, "%Y"), "Q",
+                  ceiling(as.integer(format(occurred_datetime, "%m")) / 3))) %>%
+  filter(period %in% periods)
 
 # The kind of crimes people commit...
 offense_cat <- st_drop_geometry(crime_data) %>%
@@ -113,7 +114,7 @@ offense_cat <- st_drop_geometry(crime_data) %>%
 MPLS_crime_sf <- crime_data %>%
   drop_na(Problem_Initial | Problem_Final) %>%
   mutate(
-    year = factor(year, levels = levels(years_fac)),
+    period = factor(period, levels = levels(periods_fac)),
     call_type = trimws(gsub("~PD", "", gsub("\\s*\\([^\\)]+\\)", "", Problem_Initial))),
     Offense_Category = factor(Offense_Category),
     Offense = if_else(grepl('Domestic', Offense), 'Domestic', 'Non-Domestic'),
@@ -126,12 +127,12 @@ MPLS_crime_sf <- crime_data %>%
   ) %>%
   filter(
     Offense_Category %in% offense_cat$Offense_Category[grep('Aggravated Assault', offense_cat$Offense)],
-    year %in% years,
+    period %in% periods,
     Latitude != 0,
     Longitude != 0,
   ) %>%
   drop_na(Precinct, Ward) %>%
-  select(Precinct, Ward, geometry, occurred_datetime, occurred_date, year, 
+  select(Precinct, Ward, geometry, occurred_datetime, occurred_date, period, 
          Case_Number, Type, Offense_Category, Offense,
          Crime_Count, Crime_Count_cat, Problem_Initial, Problem_Final, call_type) %>%
   distinct() %>%
@@ -156,10 +157,10 @@ MPLS_crime_sf <- MPLS_crime_sf %>%
       semi_join(dup_datetime_geom, by = c("occurred_date", "geometry_str")) %>%
       filter(Offense == "Domestic")
   ) %>%
-  arrange(Precinct, Ward, geometry_str, year)
+  arrange(Precinct, Ward, geometry_str, period)
 
 
-# Derive domestid_flag based on relevant call types
+# Derive domestic_flag based on relevant call types
 domestic_pattern <- str_c(domestic_terms, collapse = "|")
 
 MPLS_crime_sf <- MPLS_crime_sf %>%
@@ -177,12 +178,12 @@ MPLS_crime_sf <- MPLS_crime_sf %>%
 
 # Jitter points slightly
 duplicated_pts <- MPLS_crime_sf %>%
-  group_by(Precinct, Ward, geometry, year) %>%
+  group_by(Precinct, Ward, geometry, period) %>%
   summarise(n = n()) %>%
   ungroup() %>%
-  arrange(Precinct, Ward, geometry, year) %>%
-  pivot_wider(names_from = year, values_from = n, values_fill = 0) %>%
-  filter(`2020`>1 | `2021`>1 | `2022`>1) %>%
+  arrange(Precinct, Ward, geometry, period) %>%
+  pivot_wider(names_from = period, values_from = n, values_fill = 0) %>%
+  filter(if_any(all_of(periods), ~ . > 1)) %>%
   mutate(geometry_str = st_as_text(geometry)) %>%
   select(geometry, geometry_str) %>%
   mutate(coords = st_coordinates(geometry),
@@ -210,7 +211,7 @@ MPLS_crime_sf <- MPLS_crime_sf %>%
 
 # Yearly data summary of assaults
 crime_summ <- st_drop_geometry(MPLS_crime_sf) %>% 
-  group_by(year, Offense) %>% 
+  group_by(period, Offense) %>% 
   summarise(N = sum(N),
             across(c(domestic_flag, other), ~mean(.x, na.rm = TRUE)))
 

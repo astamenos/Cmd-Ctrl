@@ -34,9 +34,25 @@ body {
 }
 
 /* Section headings — brightness hierarchy */
-h1 { color: var(--text-hi); font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
-h2 { color: #c8d0e8; font-size: 1.4rem; font-weight: 600; }
-h3 { color: var(--text-lo); font-size: 1.1rem; font-weight: 500; }
+h1 {
+  color: var(--text-hi);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-family: "EB Garamond", "Cormorand", serif;
+}
+h2 {
+  color: #c8d0e8;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: "EB Garamond", "Cormorand", serif;
+}
+h3 {
+  color: var(--text-lo);
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-family: "EB Garamond", "Cormorand", serif;
+}
 
 /* Accent dividers */
 h2::after {

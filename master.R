@@ -1,11 +1,10 @@
 # Libraries
 library(scales)
 library(patchwork)
+library(cowplot)
 library(tigris)
 library(tidycensus)
-require(tigris)
-require(spdep)
-require(osmdata)
+library(osmdata)
 library(spdep)
 library(ggnewscale)
 library(parallel)
@@ -14,8 +13,8 @@ library(sf)
 library(tidyverse)
 library(nimble)
 library(lme4)
-require(FNN)
-require(gstat)
+library(FNN)
+library(gstat)
 
 # For reproducibility
 set.seed(51225)
@@ -23,8 +22,8 @@ set.seed(51225)
 # Common coordinate reference system to use for points and shapefile
 crs_use <- "+proj=utm +zone=15 +datum=WGS84"
 d_jitt <- 0.5
-years <- as.character(seq(2020, 2022, 1))
-years_fac <- factor(years)
+periods <- paste0(rep(2020:2022, each = 4), "Q", 1:4)
+periods_fac <- factor(periods, levels = periods)
 
 # Call types
 call_types <- c("no_info", "weapon", "unknown_trouble",

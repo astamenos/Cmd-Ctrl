@@ -33,7 +33,9 @@ jsd_im <- function(im1, im2, base = 2) {
 
 #----- Exponential correlation -----
 exp_corr <- function(dists, phi) {
-  exp(-dists * phi)
+  temp <- exp(-dists * phi)
+  attr(temp, 'dimnames') <- NULL
+  temp
 }
 
 #----- Covariate map -----
@@ -42,14 +44,14 @@ plot_covariate_map <- function(fill_var,
                                title = "Map",
                                legend_title = "Value",
                                fill_option = "inferno",
-                               facet_year = FALSE) {
-  
+                               facet_period = FALSE) {
+
   p <- ggplot() +
     # Main fill layer
     geom_sf(data = data_sf, aes_string(fill = fill_var)) +
-    
-    # Optional facet wrap by year
-    { if (facet_year) facet_wrap(~year) else NULL } +
+
+    # Optional facet wrap by period
+    { if (facet_period) facet_wrap(~period) else NULL } +
     
     # Bridge overlap fill
     geom_sf(data = filter(data_sf, touches_bridge == TRUE), aes_string(fill = fill_var)) +
@@ -70,9 +72,9 @@ plot_covariate_map <- function(fill_var,
     # Theme and styling
     theme_void() +
     theme(
-      legend.position = if (facet_year) 'right' else 'bottom',
-      legend.box = if (facet_year) 'horizontal' else 'vertical',
-      legend.direction = if (facet_year) 'vertical' else 'horizontal',
+      legend.position = if (facet_period) 'right' else 'bottom',
+      legend.box = if (facet_period) 'horizontal' else 'vertical',
+      legend.direction = if (facet_period) 'vertical' else 'horizontal',
       plot.title = element_text(hjust = 0.5, size = 22, face = 'bold'),
       plot.subtitle = element_text(hjust = 0.5, size = 22, face = 'bold'),
       axis.ticks = element_blank(),
@@ -158,8 +160,8 @@ inits_fn <- function() {
   list(
     beta = rnorm(p_int, beta_MLE, sd=0.1),
     gamma = rnorm(p_mark, gamma_MLE, sd=0.1),
-    u1   = rnorm(n_years, 0, 1),
-    u2   = rnorm(n_years, 0, 1),
+    u1   = rnorm(n_periods, 0, 1),
+    u2   = rnorm(n_periods, 0, 1),
     z1 = rnorm(n_K, 0, 1),
     log_sigma = rnorm(1, constants_list$mu_sigma, 0.1),
     log_tau = rnorm(2, constants_list$mu_tau, 0.1)
@@ -319,7 +321,7 @@ posterior_intensity <- function(samples_comb, model_summary) {
            `Non-Domestic` = post_mean_lambda_nondom)
   
   ggplot(to_plot) + 
-    geom_point(aes(x=log(`Non-Domestic`), y=log(Domestic), color = year)) +
+    geom_point(aes(x=log(`Non-Domestic`), y=log(Domestic), color = period)) +
     labs(x = expression(lambda['0']),  y = expression(lambda['1']))
   
   to_plot <- to_plot %>%
@@ -333,14 +335,14 @@ posterior_intensity <- function(samples_comb, model_summary) {
   
   # Combine the observed points and ips
   combined_data <- bind_rows(
-    obs_pp %>% select(x, y, year, Offense, offense_lambda, source),
-    to_plot %>% select(x, y, year, Offense, offense_lambda, source)
+    obs_pp %>% select(x, y, period, Offense, offense_lambda, source),
+    to_plot %>% select(x, y, period, Offense, offense_lambda, source)
   )
   
   # Ensure `to_plot` is split into Domestic and Non-Domestic subsets
   
   to_plot_domestic <- to_plot %>%
-    filter(Offense == 'Domestic', year %in% c('2020', '2021', '2022')) %>%
+    filter(Offense == 'Domestic', period %in% periods) %>%
     #mutate(geometry_str = st_as_text(geometry)) %>%
     #st_drop_geometry() %>%
     rename(lambda_domestic = offense_lambda) %>%
@@ -351,7 +353,7 @@ posterior_intensity <- function(samples_comb, model_summary) {
   #mutate(centroid = st_centroid(geometry))
   
   to_plot_nondomestic <- to_plot %>% 
-    filter(Offense == 'Non-Domestic', year %in% c('2020', '2021', '2022')) %>%
+    filter(Offense == 'Non-Domestic', period %in% periods) %>%
     #st_drop_geometry() %>%
     rename(lambda_nondomestic = offense_lambda) %>%
     left_join(clipped) %>%
@@ -360,7 +362,7 @@ posterior_intensity <- function(samples_comb, model_summary) {
   #mutate(centroid = st_centroid(geometry))
   
   obs_pp_filtered <- obs_pp %>% 
-    filter(year %in% c('2020', '2021', '2022')) %>%
+    filter(period %in% periods) %>%
     slice_sample(by = Offense, prop = 0.7) %>%
     mutate(plt.alpha = if_else(Offense == 'Domestic', 0.5, 0.4),
            plt.size = if_else(Offense == 'Domestic', 0.5, 0.4))
@@ -414,7 +416,7 @@ posterior_intensity <- function(samples_comb, model_summary) {
     
     #geom_sf(data = my_acs, linewidth = 0.5, fill = adjustcolor('white', alpha = 0)) +
     
-    facet_grid(Offense ~ year, switch = 'y') +
+    facet_grid(Offense ~ period, switch = 'y') +
     
     theme_minimal() +
     theme(
