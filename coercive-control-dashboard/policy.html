@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Policy &amp; Research — Coercive Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .app-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg-base); padding: 1.5rem 0; display: flex; flex-direction: column; }
+    .sidebar-back { display: flex; align-items: center; gap: .4rem; font-family: var(--font-mono); font-size: 10px; color: var(--text-3); text-decoration: none; letter-spacing: .07em; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; transition: color .12s; }
+    .sidebar-back:hover { color: var(--gold-mid); }
+    .sidebar-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-4); padding: 0 1.25rem .5rem; }
+    .sidebar-nav { list-style: none; margin: 0; padding: 0; flex: 1; }
+    .sidebar-nav a { display: flex; align-items: center; gap: .5rem; font-family: var(--font-mono); font-size: 11px; color: var(--text-3); text-decoration: none; padding: .55rem 1.25rem; letter-spacing: .04em; transition: color .1s, background .1s; border-left: 2px solid transparent; }
+    .sidebar-nav a:hover { color: var(--gold-mid); background: var(--bg-surface); border-left-color: var(--border-gold); }
+    .sidebar-nav a.active { color: var(--gold-bright); background: var(--bg-surface); border-left-color: var(--gold-mid); }
+    .sidebar-actions { padding: 1.25rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: .5rem; }
+    .btn-action { font-family: var(--font-mono); font-size: 10px; letter-spacing: .07em; color: var(--text-3); background: transparent; border: 1px solid var(--border); padding: .4rem .75rem; cursor: pointer; text-align: left; transition: color .12s, border-color .12s; }
+    .btn-action:hover { color: var(--gold-mid); border-color: var(--border-gold); }
+
+    .main-content { padding: 2.5rem 2.5rem 5rem; max-width: 1180px; }
+    .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .page-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-mid); margin-bottom: 1rem; display: flex; align-items: center; gap: .75rem; }
+    .page-label::before { content: ''; display: block; width: 18px; height: 1px; background: var(--border-gold); }
+    .page-title { font-family: var(--font-display); font-size: clamp(28px, 5vw, 48px); font-weight: 400; line-height: 1.1; color: var(--text-1); margin-bottom: .75rem; }
+    .page-desc { font-size: 14px; color: var(--text-3); line-height: 1.7; max-width: 680px; }
+
+    .section-panel { margin-bottom: 3rem; }
+    .section-h { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-4); margin-bottom: 1.25rem; display: flex; align-items: center; gap: .75rem; }
+    .section-h::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-title-lg { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--text-1); margin-bottom: .625rem; }
+    .section-intro { font-size: 13px; color: var(--text-3); line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* Toolbar */
+    .table-toolbar { display: flex; flex-wrap: wrap; gap: .625rem; align-items: center; margin-bottom: 1rem; }
+    .toolbar-input { background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-1); font-family: var(--font-mono); font-size: 12px; padding: .4rem .75rem; outline: none; min-width: 200px; }
+    .toolbar-input:focus { border-color: var(--gold-mid); }
+    .toolbar-select { background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-2); font-family: var(--font-mono); font-size: 11px; padding: .4rem .625rem; cursor: pointer; outline: none; }
+    .toolbar-select:focus { border-color: var(--gold-mid); }
+    .toolbar-right { margin-left: auto; display: flex; gap: .5rem; }
+    .btn-csv { font-family: var(--font-mono); font-size: 10px; letter-spacing: .07em; color: var(--gold-mid); background: transparent; border: 1px solid var(--border-gold); padding: .4rem .875rem; cursor: pointer; transition: background .1s; }
+    .btn-csv:hover { background: rgba(201,168,76,.08); }
+
+    /* Data table */
+    .data-table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table.data-table thead th { background: var(--bg-surface); color: var(--text-3); font-family: var(--font-mono); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; padding: .625rem 1rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+    table.data-table thead th:hover { color: var(--gold-mid); }
+    table.data-table thead th .sort-arrow { opacity: .4; margin-left: .3em; }
+    table.data-table thead th.sort-asc .sort-arrow::after { content: '↑'; opacity: 1; color: var(--gold-mid); }
+    table.data-table thead th.sort-desc .sort-arrow::after { content: '↓'; opacity: 1; color: var(--gold-mid); }
+    table.data-table tbody tr { border-bottom: 1px solid var(--border); }
+    table.data-table tbody tr:last-child { border-bottom: none; }
+    table.data-table tbody tr:hover td { background: var(--bg-surface); }
+    table.data-table tbody td { padding: .75rem 1rem; color: var(--text-2); vertical-align: top; }
+    table.data-table tbody td.mono { font-family: var(--font-mono); font-size: 11px; }
+    .table-empty { padding: 2rem 1.5rem; font-family: var(--font-mono); font-size: 12px; color: var(--text-4); text-align: center; }
+    .row-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); margin-top: .625rem; }
+
+    /* Badges */
+    .badge-cc { font-family: var(--font-mono); font-size: 10px; padding: .2rem .5rem; border: 1px solid; display: inline-block; }
+    .badge-cc.criminal { background: var(--ok-bg); color: var(--ok-fg); border-color: var(--ok-border); }
+    .badge-cc.civil { background: var(--warn-bg); color: var(--warn-fg); border-color: var(--warn-border); }
+    .badge-cc.both { background: rgba(232,197,106,.08); color: var(--gold-mid); border-color: var(--border-gold); }
+    .badge-cc.pending { background: var(--pend-bg); color: var(--pend-fg); border-color: var(--pend-border); }
+    .badge-cc.none { background: var(--none-bg); color: var(--none-fg); border-color: var(--none-border); }
+    .badge-rec { font-family: var(--font-mono); font-size: 10px; padding: .2rem .5rem; border: 1px solid var(--border); display: inline-block; color: var(--text-2); }
+    .badge-stale { font-family: var(--font-mono); font-size: 9px; color: var(--warn-fg); margin-left: .4rem; }
+    .badge-pilot { font-family: var(--font-mono); font-size: 9px; color: var(--pend-fg); margin-left: .4rem; }
+
+    /* Federal table */
+    .fed-section { margin-bottom: 2rem; }
+    .fed-section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: .75rem; }
+    table.fed-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table.fed-table th { background: var(--bg-surface); font-family: var(--font-mono); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); padding: .5rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    table.fed-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: top; }
+    table.fed-table tr:last-child td { border-bottom: none; }
+    table.fed-table tr:hover td { background: var(--bg-surface); }
+    .deadline-pill { font-family: var(--font-mono); font-size: 11px; color: var(--gold-mid); white-space: nowrap; }
+    .agency-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+    .statute-name { font-family: var(--font-display); font-size: 14px; color: var(--text-1); }
+    .statute-citation { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+    /* Legislative tracker */
+    .tracker-grid { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .tracker-row { background: var(--bg-base); padding: 1rem 1.25rem; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: start; }
+    .tracker-row:hover { background: var(--bg-surface); }
+    .bill-num { font-family: var(--font-mono); font-size: 11px; color: var(--gold-mid); margin-bottom: .25rem; }
+    .bill-state-name { font-family: var(--font-mono); font-size: 10px; color: var(--text-4); margin-bottom: .3rem; }
+    .bill-title { font-size: 13px; color: var(--text-1); margin-bottom: .3rem; line-height: 1.5; }
+    .bill-action { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
+    .bill-date { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); white-space: nowrap; }
+    .tracker-empty { padding: 2rem 1.25rem; font-family: var(--font-mono); font-size: 12px; color: var(--text-4); background: var(--bg-base); }
+
+    /* Methodology */
+    .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .method-cell { background: var(--bg-base); padding: 1.25rem 1.5rem; }
+    .method-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: .625rem; }
+    .method-body { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+    .method-body a { color: var(--gold-mid); text-decoration: none; }
+    .method-body a:hover { color: var(--gold-bright); }
+
+    .survey-anchor-block { border: 1px solid var(--border); padding: 1.5rem; background: var(--bg-surface); }
+    .survey-status-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-4); margin-bottom: .5rem; }
+    .survey-status-value { font-family: var(--font-display); font-size: 18px; color: var(--text-2); margin-bottom: .875rem; }
+    .survey-note { font-size: 13px; color: var(--text-3); line-height: 1.65; }
+    .survey-cta { display: inline-block; margin-top: 1rem; font-family: var(--font-mono); font-size: 11px; color: var(--gold-mid); text-decoration: none; letter-spacing: .06em; }
+    .survey-cta:hover { color: var(--gold-bright); }
+
+    @media (max-width: 960px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; padding: .875rem 1.25rem; gap: .75rem; }
+      .sidebar-nav { display: flex; flex-wrap: wrap; gap: .25rem; }
+      .sidebar-nav a { padding: .35rem .625rem; border-left: none; border-bottom: 2px solid transparent; }
+      .sidebar-back { border-bottom: none; margin-bottom: 0; padding: 0; }
+      .sidebar-label { display: none; }
+      .sidebar-actions { border-top: none; padding: 0; flex-direction: row; }
+      .main-content { padding: 1.5rem 1.25rem 4rem; }
+    }
+    @media (max-width: 640px) { .method-grid { grid-template-columns: 1fr; } }
+    @media print {
+      .sidebar { display: none; }
+      .app-layout { grid-template-columns: 1fr; }
+      .main-content { padding: 0; }
+      .btn-csv, .btn-action { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <span class="site-header-title">Coercive Control Platform</span>
+      <nav class="site-header-nav">
+        <a href="survivor.html">Personal Safety</a>
+        <a href="advocate.html">Advocate</a>
+        <a href="policy.html" class="active">Policy</a>
+        <a href="institutional.html">Institutional</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="sidebar-back" href="index.html">← All Modules</a>
+      <span class="sidebar-label">Sections</span>
+      <ul class="sidebar-nav">
+        <li><a href="#statutory-db">Statutory Database</a></li>
+        <li><a href="#federal">Federal Statutes</a></li>
+        <li><a href="#tracker">Legislative Tracker</a></li>
+        <li><a href="#methodology">Methodology</a></li>
+        <li><a href="#survey-results">Survey Results</a></li>
+      </ul>
+      <div class="sidebar-actions">
+        <button class="btn-action" onclick="window.print()">Print View</button>
+        <button class="btn-action" id="csv-btn-sidebar" onclick="exportCSV()">Export CSV</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div class="page-label">Policy &amp; Research</div>
+        <h1 class="page-title">Statutory Database &amp;<br>Comparative Law Matrix</h1>
+        <p class="page-desc">Full statutory coverage for all 51 jurisdictions (50 states + DC). Sortable, filterable, and exportable. Last verified dates shown per entry — stale warnings appear for records older than 12 months.</p>
+      </header>
+
+      <!-- STATUTORY DATABASE -->
+      <section id="statutory-db" class="section-panel">
+        <div class="section-h">Statutory Database</div>
+
+        <div class="table-toolbar">
+          <input class="toolbar-input" type="text" id="state-search" placeholder="Filter by state name or abbreviation…" oninput="renderTable()">
+          <select class="toolbar-select" id="cc-filter" onchange="renderTable()">
+            <option value="">All CC status</option>
+            <option value="criminal">Criminal statute</option>
+            <option value="civil">Civil only</option>
+            <option value="both">Both</option>
+            <option value="pending">Bill pending</option>
+            <option value="none">No statute</option>
+          </select>
+          <select class="toolbar-select" id="rec-filter" onchange="renderTable()">
+            <option value="">All recording tiers</option>
+            <option value="one-party">One-party</option>
+            <option value="all-party">All-party</option>
+            <option value="two-party">Two-party</option>
+          </select>
+          <div class="toolbar-right">
+            <button class="btn-csv" onclick="exportCSV()">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table" id="main-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable('name')" data-col="name">State <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('abbr')" data-col="abbr">Abbr <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('cc_status')" data-col="cc_status">CC Status <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('cc_citation')" data-col="cc_citation">CC Citation <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('rec_tier')" data-col="rec_tier">Recording <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('rec_citation')" data-col="rec_citation">Rec. Citation <span class="sort-arrow"></span></th>
+                <th onclick="sortTable('cc_effective')" data-col="cc_effective">Effective <span class="sort-arrow"></span></th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr><td colspan="7" class="table-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row-count" id="row-count"></div>
+      </section>
+
+      <!-- FEDERAL STATUTES -->
+      <section id="federal" class="section-panel">
+        <div class="section-h">Federal Statutes</div>
+        <h2 class="section-title-lg">Federal Protections</h2>
+        <p class="section-intro">Federal law provides baseline protections independent of state coercive control statutes. Filing deadlines are critical — missing them typically extinguishes the claim.</p>
+
+        <div class="fed-section">
+          <div class="fed-section-label">Workplace &amp; Employment</div>
+          <div class="data-table-wrap">
+            <table class="fed-table" id="federal-workplace-table">
+              <thead>
+                <tr>
+                  <th>Statute</th>
+                  <th>Citation</th>
+                  <th>Agency</th>
+                  <th>Filing Deadline</th>
+                  <th>Scope</th>
+                </tr>
+              </thead>
+              <tbody id="fed-workplace-body">
+                <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="fed-section">
+          <div class="fed-section-label">Whistleblower Protections</div>
+          <div class="data-table-wrap">
+            <table class="fed-table" id="federal-whistleblower-table">
+              <thead>
+                <tr>
+                  <th>Statute</th>
+                  <th>Citation</th>
+                  <th>Agency</th>
+                  <th>Filing Deadline</th>
+                  <th>Scope</th>
+                </tr>
+              </thead>
+              <tbody id="fed-whistleblower-body">
+                <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEGISLATIVE TRACKER -->
+      <section id="tracker" class="section-panel">
+        <div class="section-h">Legislative Tracker</div>
+        <h2 class="section-title-lg">Pending legislation</h2>
+        <p class="section-intro">Bills currently moving through state legislatures. Sorted by last action date, most recent first.</p>
+        <div class="tracker-grid" id="tracker-grid">
+          <div class="tracker-empty">Loading…</div>
+        </div>
+      </section>
+
+      <!-- METHODOLOGY -->
+      <section id="methodology" class="section-panel">
+        <div class="section-h">Methodology</div>
+        <h2 class="section-title-lg">Data sources &amp; limitations</h2>
+        <p class="section-intro">This platform is a policy reference tool, not legal advice. All entries reflect publicly available primary law sources as of the dates shown. Users should verify current status with primary sources before relying on any entry.</p>
+
+        <div class="method-grid">
+          <div class="method-cell">
+            <div class="method-label">Primary Sources</div>
+            <p class="method-body">State statutes drawn directly from official state legislature websites, LexisNexis, and Westlaw searches. Recording law entries cross-referenced against the Reporters Committee for Freedom of the Press (RCFP) state-by-state guide. Federal statutes drawn from USCA and agency regulation text.</p>
+          </div>
+          <div class="method-cell">
+            <div class="method-label">Update Frequency</div>
+            <p class="method-body">Entries are verified on an ongoing basis. Each record carries a <code>last_verified</code> date. Records older than 12 months trigger a stale data warning in the interface. Users who identify errors may submit corrections via the survey module.</p>
+          </div>
+          <div class="method-cell">
+            <div class="method-label">Scope &amp; Exclusions</div>
+            <p class="method-body">Coverage is limited to coercive control civil and criminal statutes, state recording consent law, and selected federal employment and whistleblower protections. Local ordinances, tribal law, and US territory law are not currently covered. Case law citations are selective and not comprehensive.</p>
+          </div>
+          <div class="method-cell">
+            <div class="method-label">Limitations</div>
+            <p class="method-body">Statutory text does not capture prosecutorial discretion, judicial interpretation, or enforcement patterns. A state with a criminal statute may have low enforcement; a state without a specific statute may have strong common-law protections. Consult a licensed attorney for advice specific to your situation.</p>
+          </div>
+          <div class="method-cell">
+            <div class="method-label">Pilot &amp; Sunset Provisions</div>
+            <p class="method-body">Some statutes (notably Hawaii HRS § 709-906, a 5-year pilot enacted 2021) contain sunset provisions that require legislative reauthorization. These are flagged with a PILOT indicator and expiry date where known. Status must be independently verified before reliance.</p>
+          </div>
+          <div class="method-cell">
+            <div class="method-label">Survey Research Protocol</div>
+            <p class="method-body">The Technology &amp; Coercive Control Survey follows Category 2 IRB exemption criteria: anonymous survey research with adults, no sensitive identifiers collected. Data minimization, informed consent, and retention policy are enforced at the platform level. See survey module for full disclosure.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SURVEY RESULTS -->
+      <section id="survey-results" class="section-panel">
+        <div class="section-h">Survey Results</div>
+        <h2 class="section-title-lg">Technology &amp; Coercive Control Survey</h2>
+        <div class="survey-anchor-block" id="survey-results-block">
+          <div class="survey-status-label">Publication Status</div>
+          <div class="survey-status-value" id="survey-status-value">Loading…</div>
+          <p class="survey-note" id="survey-note-text"></p>
+          <a class="survey-cta" href="survey.html">Participate in the survey →</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer-bar">
+    <span>Not legal advice — consult a licensed attorney for your jurisdiction.</span>
+    <a href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">DV Hotline: 1-800-799-7233</a>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+
+    let appData = null;
+    let tableRows = [];
+    let sortCol = 'name';
+    let sortDir = 1;
+
+    function isStale(dateStr) {
+      if (!dateStr) return false;
+      return Date.now() - new Date(dateStr).getTime() > 365 * 24 * 60 * 60 * 1000;
+    }
+
+    function makeBadge(cls, text) {
+      const span = document.createElement('span');
+      span.className = 'badge-cc ' + cls;
+      span.textContent = text;
+      return span;
+    }
+
+    function makeStaleMark() {
+      const span = document.createElement('span');
+      span.className = 'badge-stale';
+      span.textContent = '△ stale';
+      return span;
+    }
+
+    function makePilotMark() {
+      const span = document.createElement('span');
+      span.className = 'badge-pilot';
+      span.textContent = '⌛ pilot';
+      return span;
+    }
+
+    function ccLabel(status) {
+      const map = { criminal: 'Criminal', civil: 'Civil', both: 'Both', pending: 'Pending', none: 'None' };
+      return map[status] || status || 'None';
+    }
+
+    function recLabel(tier) {
+      const map = { 'one-party': 'One-party', 'all-party': 'All-party', 'two-party': 'Two-party' };
+      return map[tier] || tier || '—';
+    }
+
+    function buildFlatRows(states, defaultVerified) {
+      return states.map(s => {
+        const cc = s.coercive_control || {};
+        const rec = s.recording || {};
+        return {
+          name: s.name || '',
+          abbr: s.abbr || '',
+          cc_status: cc.status || cc.type || 'none',
+          cc_citation: cc.citation || '',
+          cc_effective: cc.effective_date || '',
+          cc_verified: cc.last_verified || defaultVerified,
+          cc_pilot: cc.pilot_expiry || null,
+          rec_tier: rec.tier || '',
+          rec_citation: rec.statute || rec.citation || '',
+          rec_verified: rec.last_verified || defaultVerified,
+          pending: s.pending_legislation || [],
+        };
+      });
+    }
+
+    function filterRows() {
+      const search = document.getElementById('state-search').value.toLowerCase();
+      const ccF = document.getElementById('cc-filter').value;
+      const recF = document.getElementById('rec-filter').value;
+      return tableRows.filter(r => {
+        if (search && !r.name.toLowerCase().includes(search) && !r.abbr.toLowerCase().includes(search)) return false;
+        if (ccF && r.cc_status !== ccF) return false;
+        if (recF && r.rec_tier !== recF) return false;
+        return true;
+      });
+    }
+
+    function sortRows(rows) {
+      return [...rows].sort((a, b) => {
+        const av = String(a[sortCol] || '').toLowerCase();
+        const bv = String(b[sortCol] || '').toLowerCase();
+        return sortDir * av.localeCompare(bv);
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+      const rows = sortRows(filterRows());
+      document.getElementById('row-count').textContent = rows.length + ' of ' + tableRows.length + ' jurisdictions';
+      if (!rows.length) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 7;
+        td.className = 'table-empty';
+        td.textContent = 'No results match current filters.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.textContent = r.name;
+        tr.appendChild(tdName);
+
+        const tdAbbr = document.createElement('td');
+        tdAbbr.className = 'mono';
+        tdAbbr.textContent = r.abbr;
+        tr.appendChild(tdAbbr);
+
+        const tdStatus = document.createElement('td');
+        const badgeEl = makeBadge(r.cc_status, ccLabel(r.cc_status));
+        tdStatus.appendChild(badgeEl);
+        if (isStale(r.cc_verified)) tdStatus.appendChild(makeStaleMark());
+        if (r.cc_pilot) tdStatus.appendChild(makePilotMark());
+        tr.appendChild(tdStatus);
+
+        const tdCite = document.createElement('td');
+        tdCite.className = 'mono';
+        tdCite.textContent = r.cc_citation || '—';
+        tr.appendChild(tdCite);
+
+        const tdRec = document.createElement('td');
+        const recSpan = document.createElement('span');
+        recSpan.className = 'badge-rec';
+        recSpan.textContent = recLabel(r.rec_tier);
+        tdRec.appendChild(recSpan);
+        if (isStale(r.rec_verified)) tdRec.appendChild(makeStaleMark());
+        tr.appendChild(tdRec);
+
+        const tdRecCite = document.createElement('td');
+        tdRecCite.className = 'mono';
+        tdRecCite.textContent = r.rec_citation || '—';
+        tr.appendChild(tdRecCite);
+
+        const tdEff = document.createElement('td');
+        tdEff.className = 'mono';
+        tdEff.textContent = r.cc_effective || '—';
+        tr.appendChild(tdEff);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.sortTable = function(col) {
+      if (sortCol === col) { sortDir *= -1; }
+      else { sortCol = col; sortDir = 1; }
+      document.querySelectorAll('table.data-table thead th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (th.dataset.col === col) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+      });
+      renderTable();
+    };
+
+    window.exportCSV = function() {
+      const rows = sortRows(filterRows());
+      const headers = ['State', 'Abbr', 'CC Status', 'CC Citation', 'Recording Tier', 'Rec Citation', 'Effective Date', 'CC Last Verified', 'Rec Last Verified'];
+      const lines = [headers.join(',')];
+      rows.forEach(r => {
+        const cols = [
+          '"' + r.name.replace(/"/g, '""') + '"',
+          r.abbr,
+          r.cc_status,
+          '"' + (r.cc_citation || '').replace(/"/g, '""') + '"',
+          r.rec_tier,
+          '"' + (r.rec_citation || '').replace(/"/g, '""') + '"',
+          r.cc_effective || '',
+          r.cc_verified || '',
+          r.rec_verified || '',
+        ];
+        lines.push(cols.join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'coercive-control-law-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    function renderFedTable(bodyId, items) {
+      const tbody = document.getElementById(bodyId);
+      while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+      if (!items || !items.length) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'table-empty';
+        td.textContent = 'No entries.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const tdStat = document.createElement('td');
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'statute-name';
+        nameDiv.textContent = item.statute || '';
+        tdStat.appendChild(nameDiv);
+        tr.appendChild(tdStat);
+
+        const tdCite = document.createElement('td');
+        const citeDiv = document.createElement('div');
+        citeDiv.className = 'statute-citation';
+        citeDiv.textContent = item.citation || '';
+        tdCite.appendChild(citeDiv);
+        tr.appendChild(tdCite);
+
+        const tdAgency = document.createElement('td');
+        const agDiv = document.createElement('div');
+        agDiv.className = 'agency-label';
+        agDiv.textContent = item.agency || '';
+        tdAgency.appendChild(agDiv);
+        tr.appendChild(tdAgency);
+
+        const tdDl = document.createElement('td');
+        const dlDiv = document.createElement('div');
+        dlDiv.className = 'deadline-pill';
+        dlDiv.textContent = item.filing_deadline_days ? item.filing_deadline_days + ' days' : '—';
+        tdDl.appendChild(dlDiv);
+        tr.appendChild(tdDl);
+
+        const tdScope = document.createElement('td');
+        tdScope.textContent = item.scope || '';
+        tr.appendChild(tdScope);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderTracker(allStates) {
+      const grid = document.getElementById('tracker-grid');
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+      const bills = [];
+      allStates.forEach(s => {
+        (s.pending_legislation || []).forEach(bill => {
+          bills.push({ state_abbr: s.abbr, state_name: s.name, ...bill });
+        });
+      });
+
+      if (!bills.length) {
+        const empty = document.createElement('div');
+        empty.className = 'tracker-empty';
+        empty.textContent = 'No pending legislation tracked in current data.';
+        grid.appendChild(empty);
+        return;
+      }
+
+      bills.sort((a, b) => new Date(b.last_action_date || 0) - new Date(a.last_action_date || 0));
+      bills.forEach(bill => {
+        const row = document.createElement('div');
+        row.className = 'tracker-row';
+
+        const info = document.createElement('div');
+
+        const billNum = document.createElement('div');
+        billNum.className = 'bill-num';
+        billNum.textContent = bill.bill_number || '';
+        info.appendChild(billNum);
+
+        const stateName = document.createElement('div');
+        stateName.className = 'bill-state-name';
+        stateName.textContent = bill.state_name + ' (' + bill.state_abbr + ')';
+        info.appendChild(stateName);
+
+        const title = document.createElement('div');
+        title.className = 'bill-title';
+        title.textContent = bill.title || '';
+        info.appendChild(title);
+
+        const action = document.createElement('div');
+        action.className = 'bill-action';
+        action.textContent = bill.last_action || '';
+        info.appendChild(action);
+
+        const datecol = document.createElement('div');
+        datecol.className = 'bill-date';
+        datecol.textContent = bill.last_action_date || '';
+
+        row.appendChild(info);
+        row.appendChild(datecol);
+        grid.appendChild(row);
+      });
+    }
+
+    function renderSurveyResults(sr) {
+      const statusEl = document.getElementById('survey-status-value');
+      const noteEl = document.getElementById('survey-note-text');
+      if (!sr) {
+        statusEl.textContent = 'Survey data unavailable.';
+        noteEl.textContent = '';
+        return;
+      }
+      if (sr.published && sr.aggregate_url) {
+        statusEl.textContent = 'Results published — N = ' + sr.n;
+        noteEl.textContent = 'Aggregate results are available. Individual responses are anonymised and cannot be re-identified.';
+      } else {
+        statusEl.textContent = 'Not yet published';
+        noteEl.textContent = sr.note || 'Results will be published once minimum sample size is reached. All submissions remain anonymous.';
+      }
+    }
+
+    async function init() {
+      try {
+        appData = await fetch('data.json').then(r => r.json());
+        const defaultVerified = appData.meta && appData.meta.last_verified_default;
+        tableRows = buildFlatRows(appData.states || [], defaultVerified);
+        renderTable();
+        const fed = appData.federal || {};
+        renderFedTable('fed-workplace-body', fed.workplace || []);
+        renderFedTable('fed-whistleblower-body', fed.whistleblower || []);
+        renderTracker(appData.states || []);
+        renderSurveyResults(appData.survey_results);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        const tbody = document.getElementById('table-body');
+        while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 7;
+        td.className = 'table-empty';
+        td.textContent = 'Failed to load data. Serve this file via HTTP (e.g. python3 -m http.server).';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Personal Safety — Coercive Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg-void); }
+
+    .exit-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .625rem 1.5rem;
+      background: #0a0f18;
+      border-bottom: 1px solid var(--border);
+    }
+    .exit-bar-notice {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      letter-spacing: .06em;
+    }
+    .exit-site-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: var(--none-bg);
+      border: 1px solid var(--none-border);
+      color: var(--none-fg);
+      padding: .4rem 1rem;
+      cursor: pointer;
+      transition: background .1s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .exit-site-btn:hover { background: #3a1010; }
+
+    .page-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 4.5rem 1.5rem 5rem;
+    }
+
+    .page-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .page-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--none-fg);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .page-label::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--none-border);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(30px, 6vw, 48px);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text-1);
+      margin-bottom: .875rem;
+    }
+    .page-desc {
+      font-size: 14px;
+      color: var(--text-3);
+      line-height: 1.7;
+    }
+
+    .section-panel {
+      margin-bottom: 2.5rem;
+    }
+    .section-anchor-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 2rem;
+    }
+    .anchor-chip {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .07em;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: .3rem .7rem;
+      border: 1px solid var(--border);
+      transition: color .12s, border-color .12s;
+    }
+    .anchor-chip:hover { color: var(--gold-mid); border-color: var(--border-gold); }
+
+    .section-h {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .section-h::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-title-lg {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-1);
+      margin-bottom: .625rem;
+    }
+    .section-intro {
+      font-size: 13px;
+      color: var(--text-3);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Recording law lookup */
+    .lookup-row {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .lookup-select {
+      flex: 1;
+      min-width: 180px;
+      max-width: 280px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: .45rem .75rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .lookup-select:focus { border-color: var(--gold-mid); }
+
+    .law-result {
+      display: none;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+    .law-result.visible { display: block; }
+    .law-result-header {
+      padding: 1rem 1.25rem .875rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .law-verdict {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--text-1);
+    }
+    .law-citation {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+    }
+    .law-body { padding: 1rem 1.25rem; }
+    .law-plain {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+    .law-interstate {
+      padding: .625rem .875rem;
+      background: var(--bg-raised);
+      border-left: 2px solid var(--border-gold);
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.65;
+    }
+    .law-interstate-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: .25rem;
+    }
+
+    /* Pattern checklist */
+    .checklist-intro {
+      font-size: 13px;
+      color: var(--text-3);
+      line-height: 1.7;
+      padding: .875rem 1rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .pattern-checklist { margin: 0; padding: 0; list-style: none; }
+    .pattern-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: .875rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .pattern-item:last-child { border-bottom: none; }
+    .p-check {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--text-4);
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      transition: border-color .1s;
+    }
+    .pattern-item.checked .p-check {
+      border-color: var(--none-fg);
+      background: var(--none-bg);
+    }
+    .pattern-item.checked .p-check::after {
+      content: '×';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      color: var(--none-fg);
+      line-height: 1;
+    }
+    .p-text { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+    .pattern-item.checked .p-text { color: var(--text-3); }
+    .p-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-4);
+      letter-spacing: .06em;
+      margin-bottom: .2rem;
+    }
+
+    .checklist-tally {
+      margin-top: 1rem;
+      padding: .75rem 1rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+    .tally-count {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-2);
+    }
+    .tally-count strong { color: var(--none-fg); }
+    .tally-note { font-size: 12px; color: var(--text-4); max-width: 360px; line-height: 1.5; }
+
+    /* Safety planning */
+    .plan-steps { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .plan-step {
+      background: var(--bg-base);
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .plan-step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      padding-top: 2px;
+    }
+    .plan-step-content {}
+    .plan-step-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--text-1);
+      margin-bottom: .375rem;
+    }
+    .plan-step-body { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+    .plan-step-items {
+      margin-top: .625rem;
+      padding-left: 1rem;
+      list-style: none;
+    }
+    .plan-step-items li {
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.65;
+      padding: .2rem 0;
+      position: relative;
+    }
+    .plan-step-items li::before {
+      content: '—';
+      position: absolute;
+      left: -1rem;
+      color: var(--text-4);
+    }
+
+    /* Resources */
+    .resource-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.25rem;
+    }
+    .filter-select {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: .3rem .6rem;
+      cursor: pointer;
+      outline: none;
+    }
+    .filter-select:focus { border-color: var(--gold-mid); }
+
+    .resource-list { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .resource-item {
+      background: var(--bg-base);
+      padding: 1rem 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: .5rem;
+      align-items: start;
+    }
+    .resource-name-text {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: var(--text-1);
+      margin-bottom: .25rem;
+    }
+    .resource-scope { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+    .resource-contact-col { text-align: right; }
+    .resource-phone-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-1);
+      white-space: nowrap;
+    }
+    .resource-link-text {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+      text-decoration: none;
+      margin-top: .2rem;
+    }
+    .resource-link-text:hover { color: var(--gold-bright); }
+    .resource-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-top: .375rem;
+    }
+    .resource-empty {
+      padding: 2rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-4);
+      background: var(--bg-base);
+    }
+
+    /* Intersectionality flags */
+    .flag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .flag-cell {
+      background: var(--bg-base);
+      padding: 1.25rem;
+    }
+    .flag-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: .625rem;
+    }
+    .flag-body { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+    .flag-link {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+      text-decoration: none;
+      margin-top: .5rem;
+    }
+    .flag-link:hover { color: var(--gold-bright); }
+
+    .privacy-strip {
+      margin-top: 2.5rem;
+      padding: .875rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-4);
+      line-height: 1.7;
+      letter-spacing: .03em;
+    }
+
+    @media print {
+      .exit-bar { display: none; }
+      .page-wrap { padding-top: 1.5rem; }
+      .pattern-item { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="exit-bar">
+    <span class="exit-bar-notice">No account · No tracking · No cookies</span>
+    <button class="exit-site-btn" onclick="leaveNow()">&#9632; Exit Site Now</button>
+  </div>
+
+  <main class="page-wrap">
+    <header class="page-header">
+      <div class="page-label">Personal Safety</div>
+      <h1 class="page-title">Safety Planning &amp;<br>Legal Reference</h1>
+      <p class="page-desc">Tools for understanding your rights, recognizing patterns, and planning next steps. Nothing on this page is saved or transmitted — it exists only in your browser.</p>
+    </header>
+
+    <nav class="section-anchor-nav">
+      <a class="anchor-chip" href="#recording-law">Recording Law</a>
+      <a class="anchor-chip" href="#pattern-check">Pattern Check</a>
+      <a class="anchor-chip" href="#safety-plan">Safety Planning</a>
+      <a class="anchor-chip" href="#resources">Resources</a>
+      <a class="anchor-chip" href="#communities">Your Community</a>
+    </nav>
+
+    <!-- RECORDING LAW -->
+    <section id="recording-law" class="section-panel">
+      <div class="section-h">Recording Law</div>
+      <h2 class="section-title-lg">Can I record conversations?</h2>
+      <p class="section-intro">Recording laws vary by state. One-party consent means you can record a conversation you're part of without telling the other person. All-party (two-party) consent means everyone must agree. Select your state.</p>
+
+      <div class="lookup-row">
+        <select class="lookup-select" id="state-select" onchange="showLaw(this.value)">
+          <option value="">— Select your state —</option>
+        </select>
+      </div>
+
+      <div class="law-result" id="law-result">
+        <div class="law-result-header">
+          <span class="law-verdict" id="law-verdict"></span>
+          <span class="law-citation" id="law-citation"></span>
+        </div>
+        <div class="law-body">
+          <p class="law-plain" id="law-plain"></p>
+          <div id="law-interstate-block" style="display:none">
+            <div class="law-interstate">
+              <div class="law-interstate-label">Interstate note</div>
+              <p class="law-interstate-text" id="law-interstate-text"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PATTERN CHECKLIST -->
+    <section id="pattern-check" class="section-panel">
+      <div class="section-h">Pattern Recognition</div>
+      <h2 class="section-title-lg">Recognizing coercive control</h2>
+      <div class="checklist-intro">
+        Check any behaviors you have experienced. This list is private — it is not saved or sent anywhere. It is here to help you name what you may be experiencing, not to diagnose your situation.
+      </div>
+
+      <ul class="pattern-checklist" id="pattern-list">
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Isolation</div>
+            <div class="p-text">They limit or monitor contact with friends, family, or coworkers — or make you feel guilty for spending time with others.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Isolation</div>
+            <div class="p-text">They create conflict with people close to you, or spread misinformation to isolate you from your support network.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Surveillance</div>
+            <div class="p-text">They monitor your phone, messages, email, or location — either directly or through apps or devices you didn't consent to.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Surveillance</div>
+            <div class="p-text">They demand to know your location at all times, or show up unexpectedly to check on you.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Financial control</div>
+            <div class="p-text">They control access to money, make you account for every purchase, or prevent you from working or maintaining independent finances.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Financial control</div>
+            <div class="p-text">They have run up debt in your name, damaged your credit, or interfered with your employment.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Degradation</div>
+            <div class="p-text">They consistently criticize, humiliate, or dismiss you — in private or in front of others — in ways that undermine your self-worth.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Degradation</div>
+            <div class="p-text">They deny or minimize things they have done, accuse you of misremembering, or make you feel like your perception of events is unreliable.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Threats &amp; intimidation</div>
+            <div class="p-text">They threaten harm to you, your children, pets, family members, or themselves if you don't comply with their demands.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Threats &amp; intimidation</div>
+            <div class="p-text">They display weapons, destroy property, or use physical gestures to intimidate without direct contact.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Control of daily life</div>
+            <div class="p-text">They dictate what you wear, eat, who you can speak to, where you can go, or how you spend your time.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Control of daily life</div>
+            <div class="p-text">You feel you need to ask permission for ordinary activities, or that you modify your behavior to avoid their reaction.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Custody &amp; children</div>
+            <div class="p-text">They use children as leverage — threatening custody, involving children in conflicts, or undermining your parental role.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Identity-based coercion</div>
+            <div class="p-text">They threaten to out your sexual orientation, gender identity, or immigration status as a form of control or punishment.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Reproductive coercion</div>
+            <div class="p-text">They control decisions about pregnancy, contraception, or reproductive healthcare without your agreement.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Technology &amp; privacy</div>
+            <div class="p-text">They share intimate images without consent, use technology to humiliate you, or exploit your digital accounts or information.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Post-separation</div>
+            <div class="p-text">After separation, they use legal processes, shared children, finances, or mutual contacts to continue monitoring or controlling your life.</div>
+          </div>
+        </li>
+        <li class="pattern-item" onclick="toggleItem(this)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleItem(this)">
+          <div class="p-check"></div>
+          <div>
+            <div class="p-category">Gut feeling</div>
+            <div class="p-text">You feel afraid of their reactions, walk on eggshells, or have changed who you are because of this relationship — even if you can't point to a single incident.</div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="checklist-tally" id="checklist-tally">
+        <div class="tally-count">Checked: <strong id="tally-num">0</strong> of 18</div>
+        <div class="tally-note">Coercive control is a pattern of behaviors, not a single event. Any number of checks may be meaningful. Trust your experience.</div>
+      </div>
+    </section>
+
+    <!-- SAFETY PLANNING -->
+    <section id="safety-plan" class="section-panel">
+      <div class="section-h">Safety Planning</div>
+      <h2 class="section-title-lg">Planning for safety</h2>
+      <p class="section-intro">A safety plan is a practical guide you create for yourself. There is no single right plan — it depends on your situation. These five steps cover what most safety plans address.</p>
+
+      <div class="plan-steps">
+        <div class="plan-step">
+          <div class="plan-step-num">01</div>
+          <div class="plan-step-content">
+            <div class="plan-step-title">Identify danger signals</div>
+            <p class="plan-step-body">Note the warning signs that indicate a situation may escalate — specific words, behaviors, times of day, or triggers. Knowing these lets you act earlier.</p>
+            <ul class="plan-step-items">
+              <li>What has happened just before past incidents?</li>
+              <li>Are there patterns around alcohol, stress, or specific topics?</li>
+              <li>What does your body feel before things escalate?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">02</div>
+          <div class="plan-step-content">
+            <div class="plan-step-title">Know your exit</div>
+            <p class="plan-step-body">If you need to leave quickly, having a mental map reduces the time needed. You don't need to leave permanently — this is about having options.</p>
+            <ul class="plan-step-items">
+              <li>Which exits are accessible without passing the person?</li>
+              <li>Where would you go? (Friend, family member, shelter, hotel?)</li>
+              <li>Do you have your keys, phone, ID within reach?</li>
+              <li>Is there a code word you can use with a trusted person?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">03</div>
+          <div class="plan-step-content">
+            <div class="plan-step-title">Gather essential documents</div>
+            <p class="plan-step-body">Having copies of key documents stored separately (with a trusted person or in a secure cloud account) reduces barriers if you need to leave.</p>
+            <ul class="plan-step-items">
+              <li>ID, passport, Social Security card or equivalent</li>
+              <li>Financial records, bank account numbers</li>
+              <li>Children's documents (birth certificates, school records, medical cards)</li>
+              <li>Medications you take regularly</li>
+              <li>Lease or mortgage documents; proof of ownership</li>
+            </ul>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">04</div>
+          <div class="plan-step-content">
+            <div class="plan-step-title">Secure your communication</div>
+            <p class="plan-step-body">If your device or accounts may be monitored, use a device the person doesn't know about or a private browser session. Delete this page from your history after visiting if needed.</p>
+            <ul class="plan-step-items">
+              <li>Signal (encrypted, disappearing messages) on a separate device</li>
+              <li>New email account created on a safe network</li>
+              <li>Library computers for sensitive research</li>
+              <li>Use incognito/private mode and clear history</li>
+            </ul>
+          </div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">05</div>
+          <div class="plan-step-content">
+            <div class="plan-step-title">Build your support network</div>
+            <p class="plan-step-body">Isolation is a tool of coercive control. Naming even one person you trust — and letting them know what's happening — matters.</p>
+            <ul class="plan-step-items">
+              <li>One trusted person who can receive a code word or call</li>
+              <li>A local domestic violence organization (see Resources below)</li>
+              <li>If you have children, a trusted person who can take them in an emergency</li>
+              <li>National DV Hotline: 1-800-799-7233 (24/7, confidential)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section id="resources" class="section-panel">
+      <div class="section-h">Resources</div>
+      <h2 class="section-title-lg">National organizations</h2>
+      <p class="section-intro">Filtered to organizations relevant to your needs. All are free and confidential unless noted.</p>
+
+      <div class="resource-filters">
+        <select class="filter-select" id="filter-type" onchange="filterResources()">
+          <option value="">All types</option>
+          <option value="crisis">Crisis</option>
+          <option value="legal">Legal</option>
+          <option value="digital">Digital Safety</option>
+          <option value="advocacy">Advocacy</option>
+        </select>
+        <select class="filter-select" id="filter-pop" onchange="filterResources()">
+          <option value="">All communities</option>
+          <option value="lgbtq">LGBTQ+</option>
+          <option value="immigration">Immigration</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+
+      <div class="resource-list" id="resource-list"></div>
+    </section>
+
+    <!-- INTERSECTIONALITY -->
+    <section id="communities" class="section-panel">
+      <div class="section-h">Your Community</div>
+      <h2 class="section-title-lg">Specific protections and considerations</h2>
+      <p class="section-intro">Coercive control intersects with identity in ways that affect both experience and legal options.</p>
+
+      <div class="flag-grid">
+        <div class="flag-cell">
+          <div class="flag-label">LGBTQ+ Survivors</div>
+          <p class="flag-body">Coercive control in same-sex and queer relationships is equally serious but often underrecognized by systems. Threatening to out a partner is a recognized form of coercion. LGBTQ-specific shelters and legal advocates exist in most major cities.</p>
+          <a class="flag-link" href="https://www.thehotline.org/resources/lgbtq-relationships/" target="_blank" rel="noopener noreferrer">LGBTQ+ resources →</a>
+        </div>
+        <div class="flag-cell">
+          <div class="flag-label">Immigration Status</div>
+          <p class="flag-body">VAWA (Violence Against Women Act) allows undocumented survivors to self-petition for immigration status without relying on an abusive citizen or resident spouse. Law enforcement is not required to ask about your status when responding to DV calls.</p>
+          <a class="flag-link" href="https://www.womenslaw.org/laws/federal/immigration-laws" target="_blank" rel="noopener noreferrer">VAWA immigration guide →</a>
+        </div>
+        <div class="flag-cell">
+          <div class="flag-label">Language Access</div>
+          <p class="flag-body">The DV Hotline offers interpretation in more than 200 languages. Many local shelters have staff who speak languages other than English. You have the right to an interpreter in court proceedings at no cost.</p>
+          <a class="flag-link" href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">Hotline: 1-800-799-7233 →</a>
+        </div>
+        <div class="flag-cell">
+          <div class="flag-label">Disability</div>
+          <p class="flag-body">People with disabilities experience DV at higher rates and face additional barriers — caregiving dependency, accessible shelter scarcity, and communication access. Disability-specific advocates exist and ADA protections apply to shelter access.</p>
+          <a class="flag-link" href="https://www.adavocacy.org/" target="_blank" rel="noopener noreferrer">Disability DV resources →</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="privacy-strip">
+      This page does not store, transmit, or log any information you enter. Checklist selections exist only in your browser memory and disappear when you close this tab. No account is needed. No data is collected about you.
+    </div>
+  </main>
+
+  <footer class="footer-bar">
+    <span>Not legal advice — consult a licensed attorney for your jurisdiction.</span>
+    <a href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">DV Hotline: 1-800-799-7233</a>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+
+    function leaveNow() {
+      location.replace('https://weather.com');
+    }
+    window.leaveNow = leaveNow;
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') leaveNow();
+    });
+
+    const TIER_LABELS = {
+      'one-party': 'One-party consent — you may record',
+      'all-party': 'All-party consent — everyone must agree',
+      'two-party': 'Two-party consent — everyone must agree'
+    };
+    const TIER_PRACTICAL = {
+      'one-party': 'You are legally allowed to record any conversation you are a participant in, without informing the other party. This applies to phone calls, in-person conversations, and video calls within this state. Always consult a local attorney before using recordings in legal proceedings.',
+      'all-party': 'Recording a private conversation without all parties\' knowledge is illegal in this state and may expose you to civil or criminal liability. Contact a DV advocate before attempting to record evidence — there are legal alternatives for documenting a pattern of abuse.',
+      'two-party': 'Recording a private conversation without all parties\' knowledge is illegal in this state and may expose you to civil or criminal liability. Contact a DV advocate before attempting to record evidence — there are legal alternatives for documenting a pattern of abuse.'
+    };
+
+    let appData = null;
+    let allResources = [];
+
+    function buildSelect(states) {
+      const sel = document.getElementById('state-select');
+      [...states]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.abbr;
+          opt.textContent = s.name;
+          sel.appendChild(opt);
+        });
+    }
+
+    window.showLaw = function(abbr) {
+      if (!abbr || !appData) return;
+      const s = appData.states.find(x => x.abbr === abbr);
+      if (!s) return;
+
+      const rec = s.recording || {};
+      const tier = rec.tier || 'one-party';
+
+      document.getElementById('law-verdict').textContent = TIER_LABELS[tier] || tier;
+      document.getElementById('law-citation').textContent = rec.statute || rec.citation || '';
+
+      const practicalEl = document.getElementById('law-plain');
+      practicalEl.textContent = rec.practical || TIER_PRACTICAL[tier] || '';
+
+      const interstateBlock = document.getElementById('law-interstate-block');
+      const interstateText = document.getElementById('law-interstate-text');
+      if (rec.interstate_note) {
+        interstateText.textContent = rec.interstate_note;
+        interstateBlock.style.display = '';
+      } else {
+        interstateBlock.style.display = 'none';
+      }
+
+      document.getElementById('law-result').classList.add('visible');
+    };
+
+    window.toggleItem = function(li) {
+      li.classList.toggle('checked');
+      const checked = document.querySelectorAll('#pattern-list .pattern-item.checked').length;
+      document.getElementById('tally-num').textContent = String(checked);
+    };
+
+    function makeTag(text) {
+      const span = document.createElement('span');
+      span.className = 'badge';
+      span.textContent = text;
+      return span;
+    }
+
+    function renderResources(resources) {
+      const list = document.getElementById('resource-list');
+      while (list.firstChild) list.removeChild(list.firstChild);
+
+      if (!resources.length) {
+        const empty = document.createElement('div');
+        empty.className = 'resource-empty';
+        empty.textContent = 'No resources match current filters.';
+        list.appendChild(empty);
+        return;
+      }
+
+      resources.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'resource-item';
+
+        const info = document.createElement('div');
+
+        const name = document.createElement('div');
+        name.className = 'resource-name-text';
+        name.textContent = r.name;
+        info.appendChild(name);
+
+        const tags = document.createElement('div');
+        tags.className = 'resource-tags';
+        (r.populations || []).forEach(p => tags.appendChild(makeTag(p)));
+        (r.languages || []).filter(l => l !== 'en').slice(0, 2).forEach(l => tags.appendChild(makeTag(l)));
+        info.appendChild(tags);
+
+        if (r.scope) {
+          const scope = document.createElement('div');
+          scope.className = 'resource-scope';
+          scope.textContent = r.scope;
+          info.appendChild(scope);
+        }
+
+        const contact = document.createElement('div');
+        contact.className = 'resource-contact-col';
+
+        if (r.phone) {
+          const phone = document.createElement('div');
+          phone.className = 'resource-phone-text';
+          phone.textContent = r.phone;
+          contact.appendChild(phone);
+        }
+
+        if (r.url) {
+          const link = document.createElement('a');
+          link.className = 'resource-link-text';
+          link.href = r.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = r.url.replace(/^https?:\/\//, '');
+          contact.appendChild(link);
+        }
+
+        item.appendChild(info);
+        item.appendChild(contact);
+        list.appendChild(item);
+      });
+    }
+
+    window.filterResources = function() {
+      const typeVal = document.getElementById('filter-type').value;
+      const popVal = document.getElementById('filter-pop').value;
+      const filtered = allResources.filter(r => {
+        if (typeVal && r.type !== typeVal) return false;
+        if (popVal && !(r.populations || []).includes(popVal)) return false;
+        return true;
+      });
+      renderResources(filtered);
+    };
+
+    async function init() {
+      try {
+        appData = await fetch('data.json').then(r => r.json());
+        allResources = appData.resources_national || [];
+        buildSelect(appData.states);
+        renderResources(allResources);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

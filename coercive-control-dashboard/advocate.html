@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Advocate Reference — Coercive Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <style>
+    .back-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      text-decoration: none;
+      letter-spacing: .06em;
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+    }
+    .back-link:hover { color: var(--gold-mid); }
+
+    .map-container {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 1rem;
+    }
+    .map-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .875rem;
+      flex-wrap: wrap;
+      gap: .625rem;
+    }
+    .toggle-group {
+      display: flex;
+      gap: 2px;
+      background: var(--bg-void);
+      padding: 2px;
+      border: 1px solid var(--border);
+    }
+    .toggle-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      color: var(--text-3);
+      padding: .35rem .75rem;
+      cursor: pointer;
+      transition: background .12s, color .12s;
+    }
+    .toggle-btn.active { background: var(--bg-elevated); color: var(--gold-mid); }
+
+    .map-svg-wrap { width: 100%; overflow: hidden; }
+    #us-map { width: 100%; height: auto; display: block; }
+    .map-path {
+      stroke: #04080f;
+      stroke-width: .5;
+      cursor: pointer;
+      transition: opacity .1s;
+    }
+    .map-path:hover { opacity: .75; stroke: #c9a84c; stroke-width: 1; }
+    .map-path.selected { stroke: #e8c56a; stroke-width: 1.5; }
+    .map-borders { fill: none; stroke: #04080f; stroke-width: .5; pointer-events: none; }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.25rem;
+      margin-top: .75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+      letter-spacing: .05em;
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      flex-shrink: 0;
+    }
+
+    .map-tooltip-el {
+      position: fixed;
+      background: var(--bg-overlay);
+      border: 1px solid var(--border-gold);
+      padding: .5rem .75rem;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-1);
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+      display: none;
+    }
+
+    .state-select-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: 1.25rem;
+      margin-bottom: .5rem;
+    }
+    .state-select-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    #state-select {
+      flex: 1;
+      max-width: 240px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: .375rem .625rem;
+      outline: none;
+      cursor: pointer;
+    }
+    #state-select:focus { border-color: var(--gold-mid); }
+
+    .detail-panel {
+      margin-top: 1.25rem;
+      border: 1px solid var(--border-gold);
+      background: var(--bg-raised);
+      display: none;
+    }
+    .detail-panel.visible { display: block; }
+    .detail-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 1rem 1.25rem .875rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-state-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-1);
+    }
+    .detail-abbr-label {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-3);
+      letter-spacing: .1em;
+    }
+    .detail-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 720px) { .detail-body { grid-template-columns: 1fr; } }
+    .detail-col { padding: 1rem 1.25rem; }
+    .detail-col + .detail-col { border-left: 1px solid var(--border); }
+    @media (max-width: 720px) { .detail-col + .detail-col { border-left: none; border-top: 1px solid var(--border); } }
+    .detail-col-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-4);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: .625rem;
+    }
+    .detail-tier-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: .375rem;
+    }
+    .detail-tier-text {
+      font-family: var(--font-display);
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    .detail-statute {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+      margin-bottom: .625rem;
+      word-break: break-word;
+    }
+    .detail-practical {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.65;
+      margin-bottom: .625rem;
+    }
+    .detail-interstate {
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.6;
+      border-left: 2px solid var(--border-gold);
+      padding-left: .625rem;
+    }
+    .stale-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--warn-fg);
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+    .pilot-warn-block {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--warn-fg);
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      padding: .375rem .625rem;
+      margin-bottom: .625rem;
+      letter-spacing: .04em;
+    }
+    .pending-block {
+      margin-top: .875rem;
+      padding: .625rem .75rem;
+      background: var(--pend-bg);
+      border: 1px solid var(--pend-border);
+    }
+    .pending-block-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--pend-fg);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+    }
+    .pending-block-text {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .resource-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.25rem;
+    }
+    .filter-select {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: .3rem .6rem;
+      cursor: pointer;
+      outline: none;
+    }
+    .filter-select:focus { border-color: var(--gold-mid); }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .resource-card {
+      background: var(--bg-base);
+      padding: 1rem 1.125rem;
+      display: flex;
+      flex-direction: column;
+      gap: .375rem;
+    }
+    .resource-name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: var(--text-1);
+      line-height: 1.2;
+    }
+    .resource-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-top: .125rem;
+    }
+    .resource-contact { margin-top: auto; padding-top: .5rem; }
+    .resource-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-mid);
+      text-decoration: none;
+      display: block;
+      word-break: break-all;
+    }
+    .resource-link:hover { color: var(--gold-bright); }
+    .resource-phone {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    .resource-empty {
+      padding: 2rem;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      grid-column: 1 / -1;
+    }
+
+    .doc-template {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-2);
+      padding: 1.25rem;
+      line-height: 1.9;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .checklist-bare { list-style: none; padding: 0; margin: 0; }
+    .checklist-bare li {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+    .checklist-bare li:last-child { border-bottom: none; }
+    .check-sq {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--text-4);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .print-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--border-gold);
+      color: var(--gold-mid);
+      padding: .4rem .875rem;
+      cursor: pointer;
+      transition: background .12s;
+    }
+    .print-btn:hover { background: var(--bg-elevated); }
+
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 640px) { .two-col-grid { grid-template-columns: 1fr; } }
+    .two-col-cell { background: var(--bg-base); padding: 1.25rem; }
+
+    .step-row { display: flex; gap: 1rem; }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      padding-top: 1px;
+      flex-shrink: 0;
+    }
+    .step-body { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+    .steps-list { display: grid; gap: .75rem; margin-top: .875rem; }
+
+    .important-note {
+      margin-top: 1rem;
+      padding: .625rem .75rem;
+      background: var(--pend-bg);
+      border: 1px solid var(--pend-border);
+    }
+    .important-note-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--pend-fg);
+      letter-spacing: .08em;
+      margin-bottom: .25rem;
+    }
+    .important-note-body { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="back-link" href="index.html">&#8592; Role Gate</a>
+      <nav class="header-nav">
+        <a href="survivor.html">Personal Safety</a>
+        <a href="advocate.html" class="active">Advocate</a>
+        <a href="policy.html">Policy</a>
+        <a href="institutional.html">Institutional</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Sections</div>
+        <a class="sidebar-link active" href="#law-explorer">Law Explorer</a>
+        <a class="sidebar-link" href="#documentation">Documentation</a>
+        <a class="sidebar-link" href="#digital-safety">Digital Safety</a>
+        <a class="sidebar-link" href="#resources">Resources</a>
+      </div>
+      <div class="sidebar-section" style="margin-top:auto;border-top:1px solid var(--border);padding-top:1rem;">
+        <button class="print-btn" style="width:100%" onclick="window.print()">Print / Export</button>
+      </div>
+    </nav>
+
+    <main class="main-content">
+
+      <!-- LAW EXPLORER -->
+      <section id="law-explorer" class="section-panel">
+        <div class="section-header">
+          <h2 class="section-title">Law Explorer</h2>
+          <p class="section-desc">Recording consent tiers and coercive control statute status for all 51 jurisdictions. Click a state or use the selector.</p>
+        </div>
+
+        <div class="map-container">
+          <div class="map-controls">
+            <div class="toggle-group">
+              <button class="toggle-btn active" onclick="setLayer('cc',this)">CC Status</button>
+              <button class="toggle-btn" onclick="setLayer('recording',this)">Recording Tier</button>
+            </div>
+          </div>
+          <div class="map-svg-wrap">
+            <svg id="us-map" viewBox="0 0 960 600"></svg>
+          </div>
+          <div class="map-legend" id="map-legend"></div>
+        </div>
+
+        <div class="state-select-row">
+          <span class="state-select-label">Jump to state:</span>
+          <select id="state-select" onchange="selectState(this.value)">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+
+        <div class="detail-panel" id="detail-panel">
+          <div class="detail-header">
+            <span class="detail-state-name" id="detail-name"></span>
+            <span class="detail-abbr-label" id="detail-abbr"></span>
+          </div>
+          <div class="detail-body">
+            <div class="detail-col" id="detail-recording-col">
+              <div class="detail-col-label">Recording Law</div>
+              <div class="detail-tier-row" id="detail-rec-row"></div>
+              <div class="detail-statute" id="detail-rec-statute"></div>
+              <div class="detail-practical" id="detail-rec-practical"></div>
+              <div class="detail-interstate" id="detail-rec-interstate"></div>
+            </div>
+            <div class="detail-col" id="detail-cc-col">
+              <div class="detail-col-label">Coercive Control Statute</div>
+              <div class="detail-tier-row" id="detail-cc-row"></div>
+              <div class="detail-statute" id="detail-cc-statute"></div>
+              <div class="detail-practical" id="detail-cc-scope"></div>
+              <div id="detail-pilot-block"></div>
+              <div id="detail-pending-block"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTATION TOOLKIT -->
+      <section id="documentation" class="section-panel" style="margin-top:2rem;">
+        <div class="section-header">
+          <h2 class="section-title">Documentation Toolkit</h2>
+          <p class="section-desc">Court-admissible documentation formats and chain-of-custody guidance. Print or export as needed.</p>
+        </div>
+
+        <div class="exhibit" style="margin-bottom:1.5rem;">
+          <div class="exhibit-label">Incident Log Template</div>
+          <pre class="doc-template">INCIDENT LOG — CONFIDENTIAL
+══════════════════════════════════════════════════════
+
+Date of incident:   ___________________________
+Time:               ___________________________
+Location:           ___________________________
+Witnesses present:  ___________________________
+
+DESCRIPTION (what happened, exact words used):
+───────────────────────────────────────────────
+
+
+PHYSICAL EVIDENCE (photos, messages, objects):
+───────────────────────────────────────────────
+
+
+INJURIES (describe; note if documented by medical provider):
+───────────────────────────────────────────────
+
+
+IMMEDIATE RESPONSE (did you call 911, leave, contact anyone):
+───────────────────────────────────────────────
+
+
+PRIOR PATTERN (how does this connect to previous incidents):
+───────────────────────────────────────────────
+
+
+Documented by: __________________ Date logged: ______________</pre>
+          <div style="margin-top:.75rem;">
+            <button class="print-btn" onclick="window.print()">Print Template</button>
+          </div>
+        </div>
+
+        <div class="exhibit">
+          <div class="exhibit-label">Chain of Custody — Evidence Checklist</div>
+          <ul class="checklist-bare">
+            <li><span class="check-sq"></span>Before handling: photograph evidence in situ, timestamped</li>
+            <li><span class="check-sq"></span>Record who collected, when, and where each item was found</li>
+            <li><span class="check-sq"></span>Package in clean container; label with date, item description, collector name</li>
+            <li><span class="check-sq"></span>Digital evidence (phone, laptop): do not turn on — hand to law enforcement or forensic professional</li>
+            <li><span class="check-sq"></span>Screenshot digital messages: include sender, timestamp, and full thread context</li>
+            <li><span class="check-sq"></span>Export call logs as PDF where possible; note carrier for subpoena purposes</li>
+            <li><span class="check-sq"></span>Preserve voicemails: do not delete, record to separate device if necessary</li>
+            <li><span class="check-sq"></span>Log all persons who access or handle evidence from this point forward</li>
+            <li><span class="check-sq"></span>Store in a location unknown to the subject; encrypted cloud backup recommended</li>
+            <li><span class="check-sq"></span>Provide your attorney with the log — not the originals — for initial review</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- DIGITAL SAFETY -->
+      <section id="digital-safety" class="section-panel" style="margin-top:2rem;">
+        <div class="section-header">
+          <h2 class="section-title">Digital Safety Reference</h2>
+          <p class="section-desc">Stalkerware detection, device audit, and law enforcement coordination guide for advocates.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="two-col-cell">
+            <div class="exhibit-label" style="margin-bottom:.875rem;">Stalkerware Indicators</div>
+            <ul class="checklist-bare">
+              <li><span class="check-sq"></span>Battery drains unusually fast; device runs warm at rest</li>
+              <li><span class="check-sq"></span>Mobile data usage spikes with no explanation</li>
+              <li><span class="check-sq"></span>Device takes longer than usual to shut down</li>
+              <li><span class="check-sq"></span>Abuser references private conversations or locations they could not otherwise know</li>
+              <li><span class="check-sq"></span>New apps appeared without your knowledge</li>
+              <li><span class="check-sq"></span>Screen lights up with no notification</li>
+              <li><span class="check-sq"></span>Unusual background noise during calls</li>
+              <li><span class="check-sq"></span>Abuser has had unsupervised physical access to your device</li>
+            </ul>
+            <div class="important-note">
+              <div class="important-note-label">IMPORTANT</div>
+              <p class="important-note-body">Do not remove stalkerware from a device that will be used in legal proceedings. Removal destroys forensic evidence. Consult law enforcement or the Coalition Against Stalkerware (stopstalkerware.org) first.</p>
+            </div>
+          </div>
+          <div class="two-col-cell">
+            <div class="exhibit-label" style="margin-bottom:.875rem;">Safe Device Checklist</div>
+            <ul class="checklist-bare">
+              <li><span class="check-sq"></span>Use a device the abuser does not know about (library, shelter, new prepaid)</li>
+              <li><span class="check-sq"></span>Use private/incognito browsing; clear history after each session</li>
+              <li><span class="check-sq"></span>Use Signal for encrypted communications (disappearing messages if needed)</li>
+              <li><span class="check-sq"></span>Create a new email account on a new device, not on a shared network</li>
+              <li><span class="check-sq"></span>Audit connected accounts: Google, Apple, Amazon — remove shared family access</li>
+              <li><span class="check-sq"></span>Disable location sharing on all apps; review Google Timeline settings</li>
+              <li><span class="check-sq"></span>Change passwords on a safe device — not on the monitored device</li>
+              <li><span class="check-sq"></span>Enable two-factor authentication on all critical accounts with a new number</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exhibit">
+          <div class="exhibit-label">Law Enforcement Coordination — Advocate Notes</div>
+          <div class="steps-list">
+            <div class="step-row">
+              <span class="step-num">01</span>
+              <p class="step-body">Request a copy of the police report immediately. Officers are legally required to provide it within a specific timeframe in most states. Verify the domestic flag was applied.</p>
+            </div>
+            <div class="step-row">
+              <span class="step-num">02</span>
+              <p class="step-body">If digital evidence is present (stalkerware, intercepted messages), request referral to a digital forensics unit. Many departments have specialized DV digital units. Document the referral date and officer name.</p>
+            </div>
+            <div class="step-row">
+              <span class="step-num">03</span>
+              <p class="step-body">VAWA requires that victims' immigration status not be disclosed by law enforcement and that U-visas are available for cooperative crime victims. Flag this proactively for immigrant survivors before any contact with officers.</p>
+            </div>
+            <div class="step-row">
+              <span class="step-num">04</span>
+              <p class="step-body">The Lautenberg Amendment prohibits domestic violence misdemeanants from possessing firearms. If firearms are present, request this be investigated and gun-surrender orders enforced.</p>
+            </div>
+            <div class="step-row">
+              <span class="step-num">05</span>
+              <p class="step-body">Maintain your own log of all law enforcement contacts: officer name, badge number, date, outcome. This protects survivors when officers fail to act and is admissible in civil proceedings.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESOURCE DIRECTORY -->
+      <section id="resources" class="section-panel" style="margin-top:2rem;">
+        <div class="section-header">
+          <h2 class="section-title">Resource Directory</h2>
+          <p class="section-desc">National organizations filtered by type and population. Last verified <span id="resources-verified">—</span>.</p>
+        </div>
+
+        <div class="resource-filters">
+          <select class="filter-select" id="filter-type" onchange="filterResources()">
+            <option value="">All types</option>
+            <option value="crisis">Crisis</option>
+            <option value="legal">Legal</option>
+            <option value="digital">Digital Safety</option>
+            <option value="advocacy">Advocacy</option>
+            <option value="policy">Policy</option>
+            <option value="whistleblower">Whistleblower</option>
+          </select>
+          <select class="filter-select" id="filter-pop" onchange="filterResources()">
+            <option value="">All populations</option>
+            <option value="general">General</option>
+            <option value="lgbtq">LGBTQ+</option>
+            <option value="immigration">Immigration</option>
+            <option value="workplace">Workplace</option>
+          </select>
+        </div>
+
+        <div class="resource-grid" id="resource-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer-bar">
+    <span>Not legal advice — consult a licensed attorney for your jurisdiction.</span>
+    <a href="https://www.thehotline.org/" target="_blank" rel="noopener noreferrer">DV Hotline: 1-800-799-7233</a>
+  </footer>
+
+  <div class="map-tooltip-el" id="map-tooltip"></div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const STALE_MS = 365 * 24 * 60 * 60 * 1000;
+    const TODAY = Date.now();
+
+    const CC_COLORS = {
+      criminal: '#52b788',
+      civil:    '#d4895a',
+      both:     '#e8c56a',
+      pending:  '#5b9cf6',
+      none:     '#2e3e52'
+    };
+    const REC_COLORS = {
+      'one-party': '#c9a84c',
+      'all-party': '#5b9cf6',
+      'two-party': '#5b9cf6'
+    };
+    const CC_LEGEND_ITEMS = [
+      { key: 'criminal', label: 'Criminal statute' },
+      { key: 'civil',    label: 'Civil only' },
+      { key: 'both',     label: 'Criminal + Civil' },
+      { key: 'pending',  label: 'Pending legislation' },
+      { key: 'none',     label: 'No statute' }
+    ];
+    const REC_LEGEND_ITEMS = [
+      { key: 'one-party', label: 'One-party consent' },
+      { key: 'all-party', label: 'All-party consent' }
+    ];
+
+    const FIPS = {
+      '01':'AL','02':'AK','04':'AZ','05':'AR','06':'CA','08':'CO','09':'CT',
+      '10':'DE','11':'DC','12':'FL','13':'GA','15':'HI','16':'ID','17':'IL',
+      '18':'IN','19':'IA','20':'KS','21':'KY','22':'LA','23':'ME','24':'MD',
+      '25':'MA','26':'MI','27':'MN','28':'MS','29':'MO','30':'MT','31':'NE',
+      '32':'NV','33':'NH','34':'NJ','35':'NM','36':'NY','37':'NC','38':'ND',
+      '39':'OH','40':'OK','41':'OR','42':'PA','44':'RI','45':'SC','46':'SD',
+      '47':'TN','48':'TX','49':'UT','50':'VT','51':'VA','53':'WA','54':'WV',
+      '55':'WI','56':'WY'
+    };
+    const CC_STATUS_LABELS = {
+      criminal: 'Criminal Statute',
+      civil: 'Civil Provision Only',
+      both: 'Criminal + Civil',
+      pending: 'Pending Legislation',
+      none: 'No Statute'
+    };
+    const TYPE_LABELS = {
+      crisis: 'Crisis', legal: 'Legal', digital: 'Digital',
+      advocacy: 'Advocacy', policy: 'Policy', whistleblower: 'Whistleblower'
+    };
+
+    let appData = null;
+    let stateByAbbr = {};
+    let currentLayer = 'cc';
+    let allResources = [];
+
+    function isStale(dateStr) {
+      if (!dateStr) return false;
+      return TODAY - new Date(dateStr).getTime() > STALE_MS;
+    }
+
+    function ccColor(state) {
+      return CC_COLORS[(state.coercive_control || {}).status] || CC_COLORS.none;
+    }
+
+    function recColor(state) {
+      const tier = (state.recording || {}).tier || 'one-party';
+      return REC_COLORS[tier] || REC_COLORS['one-party'];
+    }
+
+    function renderLegend(layer) {
+      const legendEl = document.getElementById('map-legend');
+      while (legendEl.firstChild) legendEl.removeChild(legendEl.firstChild);
+      const items = layer === 'cc' ? CC_LEGEND_ITEMS : REC_LEGEND_ITEMS;
+      const colors = layer === 'cc' ? CC_COLORS : REC_COLORS;
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'legend-item';
+        const swatch = document.createElement('span');
+        swatch.className = 'legend-swatch';
+        swatch.style.background = colors[item.key];
+        div.appendChild(swatch);
+        div.appendChild(document.createTextNode(item.label));
+        legendEl.appendChild(div);
+      });
+    }
+
+    window.setLayer = function(layer, btn) {
+      currentLayer = layer;
+      document.querySelectorAll('.toggle-btn').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+      d3.selectAll('.map-path').attr('fill', d => {
+        const abbr = FIPS[String(d.id).padStart(2, '0')];
+        const s = abbr && stateByAbbr[abbr];
+        if (!s) return '#1a2b44';
+        return layer === 'cc' ? ccColor(s) : recColor(s);
+      });
+      renderLegend(layer);
+    };
+
+    function buildSelect() {
+      const sel = document.getElementById('state-select');
+      [...appData.states]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.abbr;
+          opt.textContent = s.name;
+          sel.appendChild(opt);
+        });
+    }
+
+    window.selectState = function(abbr) {
+      if (!abbr) return;
+      d3.selectAll('.map-path').classed('selected', d => {
+        return FIPS[String(d.id).padStart(2, '0')] === abbr;
+      });
+      showDetail(abbr);
+    };
+
+    function clearEl(id) {
+      const el = document.getElementById(id);
+      while (el && el.firstChild) el.removeChild(el.firstChild);
+      return el;
+    }
+
+    function makeStaleBadge() {
+      const span = document.createElement('span');
+      span.className = 'stale-badge';
+      span.textContent = '△ Data may be stale';
+      return span;
+    }
+
+    function showDetail(abbr) {
+      const s = stateByAbbr[abbr];
+      if (!s) return;
+
+      const panel = document.getElementById('detail-panel');
+      panel.classList.add('visible');
+
+      document.getElementById('detail-name').textContent = s.name;
+      document.getElementById('detail-abbr').textContent = s.abbr;
+
+      const rec = s.recording || {};
+      const recStale = isStale(rec.last_verified || (appData.meta && appData.meta.last_verified_default));
+      const recRow = clearEl('detail-rec-row');
+      const tierText = (rec.tier || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const tierSpan = document.createElement('span');
+      tierSpan.className = 'detail-tier-text';
+      tierSpan.textContent = tierText || '—';
+      recRow.appendChild(tierSpan);
+      if (recStale) recRow.appendChild(makeStaleBadge());
+
+      document.getElementById('detail-rec-statute').textContent = rec.statute || '—';
+      document.getElementById('detail-rec-practical').textContent = rec.practical || '';
+      document.getElementById('detail-rec-interstate').textContent = rec.interstate_note || '';
+
+      const cc = s.coercive_control || {};
+      const ccStale = isStale(cc.last_verified || (appData.meta && appData.meta.last_verified_default));
+      const ccRow = clearEl('detail-cc-row');
+      const ccSpan = document.createElement('span');
+      ccSpan.className = 'detail-tier-text';
+      ccSpan.textContent = CC_STATUS_LABELS[cc.status] || cc.status || 'Unknown';
+      ccRow.appendChild(ccSpan);
+      if (ccStale) ccRow.appendChild(makeStaleBadge());
+
+      document.getElementById('detail-cc-statute').textContent =
+        cc.statute || (cc.status === 'none' ? 'Not codified' : '—');
+      document.getElementById('detail-cc-scope').textContent = cc.scope_note || '';
+
+      const pilotBlock = clearEl('detail-pilot-block');
+      if (cc.pilot_expiry) {
+        const div = document.createElement('div');
+        div.className = 'pilot-warn-block';
+        const exp = new Date(cc.pilot_expiry);
+        div.textContent = '⚠ Pilot provision — expires ' +
+          exp.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
+          '. Verify renewal status.';
+        pilotBlock.appendChild(div);
+      }
+
+      const pendingBlock = clearEl('detail-pending-block');
+      const pending = (s.pending_legislation || [])[0];
+      if (pending) {
+        const div = document.createElement('div');
+        div.className = 'pending-block';
+        const label = document.createElement('div');
+        label.className = 'pending-block-label';
+        label.textContent = 'Pending Legislation';
+        div.appendChild(label);
+        const text = document.createElement('div');
+        text.className = 'pending-block-text';
+        text.textContent = pending.bill_number + (pending.title ? ' — ' + pending.title : '') +
+          (pending.last_action ? '. Last action: ' + pending.last_action : '') +
+          (pending.last_action_date ? ' (' + pending.last_action_date + ').' : '');
+        div.appendChild(text);
+        pendingBlock.appendChild(div);
+      }
+
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderResources() {
+      const verifiedEl = document.getElementById('resources-verified');
+      const defaultDate = appData.meta && appData.meta.last_verified_default;
+      if (defaultDate) {
+        verifiedEl.textContent = new Date(defaultDate).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+      filterResources();
+    }
+
+    function makeTag(text, cls) {
+      const span = document.createElement('span');
+      span.className = 'badge' + (cls ? ' ' + cls : '');
+      span.textContent = text;
+      return span;
+    }
+
+    window.filterResources = function() {
+      const typeVal = document.getElementById('filter-type').value;
+      const popVal = document.getElementById('filter-pop').value;
+      const filtered = allResources.filter(r => {
+        if (typeVal && r.type !== typeVal) return false;
+        if (popVal && !(r.populations || []).includes(popVal)) return false;
+        return true;
+      });
+
+      const grid = document.getElementById('resource-grid');
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+      if (!filtered.length) {
+        const msg = document.createElement('div');
+        msg.className = 'resource-empty';
+        msg.textContent = 'No resources match current filters.';
+        grid.appendChild(msg);
+        return;
+      }
+
+      filtered.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'resource-card';
+
+        const name = document.createElement('div');
+        name.className = 'resource-name';
+        name.textContent = r.name;
+        card.appendChild(name);
+
+        const meta = document.createElement('div');
+        meta.className = 'resource-meta';
+        if (r.type) meta.appendChild(makeTag(TYPE_LABELS[r.type] || r.type, 'badge--pend'));
+        (r.populations || []).forEach(p => meta.appendChild(makeTag(p)));
+        (r.languages || []).slice(0, 3).forEach(l => meta.appendChild(makeTag(l)));
+        card.appendChild(meta);
+
+        const contact = document.createElement('div');
+        contact.className = 'resource-contact';
+        if (r.phone) {
+          const phone = document.createElement('div');
+          phone.className = 'resource-phone';
+          phone.textContent = r.phone + (r.text ? ' · ' + r.text : '');
+          contact.appendChild(phone);
+        }
+        if (r.url) {
+          const link = document.createElement('a');
+          link.className = 'resource-link';
+          link.href = r.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = r.url.replace(/^https?:\/\//, '');
+          contact.appendChild(link);
+        }
+        if (r.chat_url && r.chat_url !== r.url) {
+          const chat = document.createElement('a');
+          chat.className = 'resource-link';
+          chat.href = r.chat_url;
+          chat.target = '_blank';
+          chat.rel = 'noopener noreferrer';
+          chat.textContent = 'Online chat';
+          contact.appendChild(chat);
+        }
+        card.appendChild(contact);
+        grid.appendChild(card);
+      });
+    };
+
+    async function init() {
+      try {
+        const [dataRes, topoRes] = await Promise.all([
+          fetch('data.json').then(r => r.json()),
+          fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(r => r.json())
+        ]);
+
+        appData = dataRes;
+        appData.states.forEach(s => { stateByAbbr[s.abbr] = s; });
+        allResources = appData.resources_national || [];
+
+        buildSelect();
+        renderLegend('cc');
+        renderResources();
+
+        const tooltip = document.getElementById('map-tooltip');
+        const svg = d3.select('#us-map');
+        const projection = d3.geoAlbersUsa().scale(1280).translate([487.5, 305]);
+        const path = d3.geoPath(projection);
+        const stateFeatures = topojson.feature(topoRes, topoRes.objects.states);
+
+        svg.selectAll('.map-path')
+          .data(stateFeatures.features)
+          .join('path')
+          .attr('class', 'map-path')
+          .attr('d', path)
+          .attr('fill', d => {
+            const abbr = FIPS[String(d.id).padStart(2, '0')];
+            const s = abbr && stateByAbbr[abbr];
+            return s ? ccColor(s) : '#1a2b44';
+          })
+          .on('mousemove', function(event, d) {
+            const abbr = FIPS[String(d.id).padStart(2, '0')];
+            const s = abbr && stateByAbbr[abbr];
+            if (s) {
+              const cc = s.coercive_control || {};
+              const rec = s.recording || {};
+              const tier = (rec.tier || '').replace(/-/g, ' ');
+              tooltip.style.display = 'block';
+              tooltip.style.left = (event.clientX + 12) + 'px';
+              tooltip.style.top  = (event.clientY - 8) + 'px';
+              tooltip.textContent = s.name + ' — ' + tier + ' consent · CC: ' + (cc.status || 'none');
+            }
+          })
+          .on('mouseleave', () => { tooltip.style.display = 'none'; })
+          .on('click', function(_event, d) {
+            const abbr = FIPS[String(d.id).padStart(2, '0')];
+            if (abbr) {
+              document.getElementById('state-select').value = abbr;
+              window.selectState(abbr);
+            }
+          });
+
+        svg.append('path')
+          .attr('class', 'map-borders')
+          .attr('d', path(topojson.mesh(topoRes, topoRes.objects.states)));
+
+      } catch (err) {
+        console.error('Initialization failed:', err);
+      }
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          document.querySelectorAll('.sidebar-link').forEach(l => {
+            l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: .25 });
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+    init();
+  })();
+  </script>
+</body>
+</html>
