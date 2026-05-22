@@ -1,0 +1,1086 @@
+{
+  "meta": {
+    "version": "1.0",
+    "updated": "2026-05-22",
+    "sources": [
+      "RCFP Reporter's Recording Guide",
+      "NCSL State Wiretapping Laws",
+      "BWJP 2024 Coercive Control Codification Matrix",
+      "WomensLaw.org",
+      "Vera Institute",
+      "Individual state legislative websites"
+    ],
+    "disclaimer": "This data is for educational purposes only. It is not legal advice. Verify statute status before relying on any entry."
+  },
+  "states": [
+    {
+      "abbr": "AL",
+      "name": "Alabama",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ala. Code \u00a7 13A-11-30 et seq.",
+        "scope_note": "Prohibits eavesdropping by non-participants. Participants may record conversations they are part of.",
+        "interstate_note": "Federal one-party baseline governs for interstate calls. Apply all-party standard if the other party is in a stricter state.",
+        "practical": "You can legally record any conversation you are part of without notifying the other person."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Alabama statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "AK",
+      "name": "Alaska",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Alaska Stat. \u00a7 42.20.310",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording is lawful.",
+        "interstate_note": "Federal one-party baseline applies. Consult all-party rules if the other party is in CA, FL, MA, or PA.",
+        "practical": "You can record without disclosure. Keep recordings securely stored and timestamped."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Alaska statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "AZ",
+      "name": "Arizona",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ariz. Rev. Stat. \u00a7 13-3005",
+        "scope_note": "One-party consent. Participant recording explicitly lawful.",
+        "interstate_note": "Federal one-party baseline governs for interstate calls. Apply stricter standard when calling into all-party states.",
+        "practical": "You can record conversations you are a party to. No notification required."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Arizona statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "AR",
+      "name": "Arkansas",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ark. Code Ann. \u00a7 5-60-120",
+        "scope_note": "Covers wire, oral, cellular, and cordless phone communications. Participant recording permitted.",
+        "interstate_note": "Federal one-party baseline applies. Consult stricter state law if the other party is in an all-party state.",
+        "practical": "You can record any conversation you are part of without notifying others."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Arkansas statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "CA",
+      "name": "California",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Cal. Penal Code \u00a7 632; \u00a7 632.7",
+        "scope_note": "Covers all confidential communications, including cellular calls (\u00a7 632.7). Criminal offense. Civil damages also available. One of the strictest all-party states.",
+        "interstate_note": "California courts assert jurisdiction when any party is in CA. Apply all-party rule even for interstate calls if you or the other party is in CA.",
+        "practical": "You must notify all parties before recording. Failure is a criminal offense and creates civil liability. Consider stating 'This call is being recorded' before the conversation."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "Cal. Fam. Code \u00a7 6320",
+        "year": 2021,
+        "scope_note": "Coercive control included as a basis for DVRO. The statute defines CC as a pattern of behavior that unreasonably interferes with a person's free will and personal liberty."
+      }
+    },
+    {
+      "abbr": "CO",
+      "name": "Colorado",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Colo. Rev. Stat. \u00a7\u00a7 18-9-303, 18-9-304",
+        "scope_note": "Participant recording permitted. One-party consent mirrors federal baseline.",
+        "interstate_note": "Federal one-party baseline governs for interstate calls. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record conversations you participate in without disclosure."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "Colo. Rev. Stat. \u00a7 14-10-124",
+        "year": 2024,
+        "scope_note": "Coercive control relevant to parenting time and allocation of parental responsibilities determinations as of 2024."
+      }
+    },
+    {
+      "abbr": "CT",
+      "name": "Connecticut",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Conn. Gen. Stat. \u00a7 52-570d; \u00a7 53a-189",
+        "scope_note": "Split regime: phone calls require all-party consent (civil liability under \u00a7 52-570d); in-person participant recording carries lower criminal risk but civil exposure remains. Treat as all-party for all practical purposes.",
+        "interstate_note": "Connecticut courts may assert jurisdiction when any party is in CT. Apply all-party standard to be safe.",
+        "practical": "Disclose recording before the conversation. Even in-person recordings carry civil liability if made without notice."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "Conn. Gen. Stat. \u00a7 46b-1",
+        "year": 2021,
+        "scope_note": "Coercive control included in the definition of family violence. Basis for civil protective order."
+      }
+    },
+    {
+      "abbr": "DC",
+      "name": "District of Columbia",
+      "recording": {
+        "tier": "one-party",
+        "statute": "D.C. Code \u00a7 23-542",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording is lawful.",
+        "interstate_note": "Federal law governs. If the other party is in an all-party state, consult their law.",
+        "practical": "You can record conversations you are a party to without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in DC statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "DE",
+      "name": "Delaware",
+      "recording": {
+        "tier": "all-party",
+        "statute": "11 Del. C. \u00a7 1335 (practical standard); cf. \u00a7 2402",
+        "scope_note": "Statutory conflict between \u00a7 2402 (one-party wiretapping) and \u00a7 1335 (criminal privacy \u2014 all-party implied). Courts advise all-party standard to avoid \u00a7 1335 liability. Disputed \u2014 treat as all-party for safety.",
+        "interstate_note": "Apply all-party standard when any party is in Delaware.",
+        "practical": "Notify all parties before recording to avoid criminal and civil exposure under \u00a7 1335."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Delaware statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "FL",
+      "name": "Florida",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Fla. Stat. \u00a7 934.03",
+        "scope_note": "Third-degree felony (up to 5 years). One of the strictest all-party states. Covers oral, wire, and electronic communications.",
+        "interstate_note": "Florida asserts jurisdiction when any party is in FL. Apply all-party rule even for interstate calls.",
+        "practical": "Must notify all parties before recording. Violation is a felony. Consider written confirmation or recorded disclosure statement."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Florida statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "GA",
+      "name": "Georgia",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ga. Code Ann. \u00a7 16-11-62",
+        "scope_note": "Participant recording not prohibited. One-party consent effective.",
+        "interstate_note": "Federal one-party baseline applies for interstate calls. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without disclosure. Keep recordings secured and with timestamps."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Georgia statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "HI",
+      "name": "Hawaii",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Haw. Rev. Stat. \u00a7 803-42",
+        "scope_note": "One-party consent for recording. Participant recording is lawful.",
+        "interstate_note": "Federal one-party baseline governs. Consult all-party law if the other party is in a stricter state.",
+        "practical": "You can record conversations you participate in without disclosure."
+      },
+      "coercive_control": {
+        "status": "criminal",
+        "statute": "Haw. Rev. Stat. \u00a7 709-906",
+        "year": 2021,
+        "scope_note": "PILOT PROGRAM \u2014 enacted 2021 for 5 years (expires 2026). Verify renewal status before relying on this entry. Hawaii is the only U.S. state with a criminal coercive control statute. Defined as a pattern of threatening, humiliating, or intimidating acts used to harm, punish, or frighten."
+      }
+    },
+    {
+      "abbr": "ID",
+      "name": "Idaho",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Idaho Code \u00a7 18-6702",
+        "scope_note": "One-party consent. Participant recording lawful.",
+        "interstate_note": "Federal one-party baseline applies. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Idaho statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "IL",
+      "name": "Illinois",
+      "recording": {
+        "tier": "all-party",
+        "statute": "720 ILCS 5/14-2",
+        "scope_note": "Covers participant recording explicitly. Class 4 felony. Eavesdropping Act applies broadly to electronic, oral, and wire communications.",
+        "interstate_note": "Illinois courts assert jurisdiction when any party is in IL. Apply all-party rule for interstate calls.",
+        "practical": "Must notify all parties before recording. Violation is a felony. Document any oral notification in writing."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "HB 5474 pending as of 2026 \u2014 coercive control criminal statute under consideration. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "IN",
+      "name": "Indiana",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ind. Code \u00a7 35-33.5-1-5",
+        "scope_note": "One-party consent. Participant recording not prohibited.",
+        "interstate_note": "Federal one-party baseline governs interstate calls. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record conversations you are part of without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Indiana statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "IA",
+      "name": "Iowa",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Iowa Code \u00a7 808B.2",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording lawful.",
+        "interstate_note": "Federal law governs. Consult stricter state law if the other party is in an all-party state.",
+        "practical": "You can record without disclosure. Preserve recordings securely."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Iowa statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "KS",
+      "name": "Kansas",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Kan. Stat. Ann. \u00a7 21-6101",
+        "scope_note": "One-party consent. Participant recording permitted.",
+        "interstate_note": "Federal one-party baseline applies. Consult stricter state law for interstate calls.",
+        "practical": "You can record conversations you are part of without notifying others."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Kansas statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "KY",
+      "name": "Kentucky",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ky. Rev. Stat. Ann. \u00a7 526.010",
+        "scope_note": "Participant recording lawful. One-party consent mirrors federal baseline.",
+        "interstate_note": "Federal law governs interstate calls. Consult all-party rules if calling into a stricter state.",
+        "practical": "You can record without disclosure. Keep originals with timestamps."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "Coercive control legislation pending as of 2026. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "LA",
+      "name": "Louisiana",
+      "recording": {
+        "tier": "one-party",
+        "statute": "La. Rev. Stat. Ann. \u00a7 15:1303",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording lawful.",
+        "interstate_note": "Federal law governs. Consult stricter state law when calling into an all-party state.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Louisiana statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "ME",
+      "name": "Maine",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Me. Rev. Stat. Ann. tit. 15, \u00a7 709",
+        "scope_note": "Participant recording permitted. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs interstate calls. Consult stricter law for all-party states.",
+        "practical": "You can record conversations you participate in without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "Coercive control legislation pending as of 2026. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "MD",
+      "name": "Maryland",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Md. Code Ann., Cts. & Jud. Proc. \u00a7 10-402",
+        "scope_note": "Felony (up to 5 years). Consistently applied by courts. Covers electronic, oral, and wire communications.",
+        "interstate_note": "Maryland asserts jurisdiction when any party is in MD. Apply all-party rule for interstate calls.",
+        "practical": "Must notify all parties before recording. Violation is a felony. Record a verbal disclosure statement before the conversation begins."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "Coercive control legislation pending as of 2026. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "MA",
+      "name": "Massachusetts",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Mass. Gen. Laws ch. 272, \u00a7 99",
+        "scope_note": "Nation's strictest: all violations are felonies. No misdemeanor tier. Up to 5 years + $10,000 fine. Courts have consistently applied to participant recording.",
+        "interstate_note": "Massachusetts courts assert jurisdiction when any party is in MA. Apply all-party rule for all interstate calls.",
+        "practical": "Must notify all parties before recording. Felony risk is significant. Verbal notice captured on recording is best practice."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "Mass. Gen. Laws ch. 209A, \u00a7 1",
+        "year": 2024,
+        "scope_note": "Coercive control included in the definition of abuse for purposes of civil protective order as of 2024."
+      }
+    },
+    {
+      "abbr": "MI",
+      "name": "Michigan",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Mich. Comp. Laws \u00a7 750.539c",
+        "scope_note": "Technically all-party. Sullivan v. Gray (1982) Court of Appeals held participant recording lawful, but Michigan Supreme Court has not confirmed. Treat as all-party for safety.",
+        "interstate_note": "Apply all-party standard when any party is in Michigan.",
+        "practical": "Notify all parties before recording to avoid risk. The law is disputed but criminal penalties exist."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Michigan statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "MN",
+      "name": "Minnesota",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Minn. Stat. \u00a7 626A.02",
+        "scope_note": "Mirrors federal one-party baseline. Applies to wire and oral communications.",
+        "interstate_note": "Federal one-party rule applies for interstate calls. Consult stricter law if calling into an all-party state.",
+        "practical": "You can record any conversation you are a party to without notifying the other person."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Minnesota statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "MS",
+      "name": "Mississippi",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Miss. Code Ann. \u00a7 41-29-531",
+        "scope_note": "One-party consent. Participant recording lawful.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter state law for interstate calls into all-party states.",
+        "practical": "You can record without notifying others. Preserve recordings securely."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Mississippi statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "MO",
+      "name": "Missouri",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Mo. Rev. Stat. \u00a7 542.402",
+        "scope_note": "One-party consent. Participant recording permitted.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter state law when calling into an all-party state.",
+        "practical": "You can record conversations you are part of without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Missouri statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "MT",
+      "name": "Montana",
+      "recording": {
+        "tier": "all-party",
+        "statute": "Mont. Code Ann. \u00a7 45-8-213",
+        "scope_note": "Notice required. Explicit consent not required by statute text, but notification is mandatory. Misdemeanor.",
+        "interstate_note": "Apply all-party notice standard when any party is in Montana.",
+        "practical": "Notify all parties before recording. Verbal notice sufficient under Montana law \u2014 ensure notification is audible on the recording."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Montana statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "NE",
+      "name": "Nebraska",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Neb. Rev. Stat. \u00a7 86-290",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording lawful.",
+        "interstate_note": "Federal law governs. Consult stricter state law for interstate calls.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Nebraska statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "NV",
+      "name": "Nevada",
+      "recording": {
+        "tier": "all-party",
+        "statute": "NRS \u00a7 200.620 (phone); \u00a7 200.650 (in-person)",
+        "scope_note": "Phone calls: all-party consent required (\u00a7 200.620). In-person conversations: one-party consent (\u00a7 200.650). Felony for either violation. Treat as all-party for phone calls.",
+        "interstate_note": "Nevada asserts jurisdiction for telephone interceptions when any party is in NV.",
+        "practical": "For phone calls: notify all parties before recording \u2014 felony risk. For in-person conversations: you can record without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Nevada statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "NH",
+      "name": "New Hampshire",
+      "recording": {
+        "tier": "all-party",
+        "statute": "RSA 570-A:2",
+        "scope_note": "Class B felony for interception. Misdemeanor for participant recording without consent. One of the few states that explicitly criminalizes participant recording.",
+        "interstate_note": "Apply all-party standard when any party is in New Hampshire.",
+        "practical": "Must notify all parties before recording. Even participants face misdemeanor charges if they do not obtain consent."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in New Hampshire statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "NJ",
+      "name": "New Jersey",
+      "recording": {
+        "tier": "one-party",
+        "statute": "N.J. Stat. Ann. \u00a7 2A:156A-4(d)",
+        "scope_note": "Participant recording lawful under the wiretapping act. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs interstate calls. Consult stricter law if calling into an all-party state.",
+        "practical": "You can record conversations you are part of without notifying others."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "N.J.S.A. 2C:25-29(a)(7)",
+        "year": 2024,
+        "scope_note": "Coercive control recognized as a factor in domestic violence protective order proceedings as of 2024."
+      }
+    },
+    {
+      "abbr": "NM",
+      "name": "New Mexico",
+      "recording": {
+        "tier": "one-party",
+        "statute": "N.M. Stat. Ann. \u00a7 30-12-1",
+        "scope_note": "One-party consent. Participant recording lawful.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without disclosure. Keep recordings preserved and timestamped."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in New Mexico statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "NY",
+      "name": "New York",
+      "recording": {
+        "tier": "one-party",
+        "statute": "N.Y. Penal Law \u00a7 250.00 et seq.",
+        "scope_note": "Commonly misunderstood \u2014 New York is one-party, not all-party. Participant recording is lawful under the wiretapping statute.",
+        "interstate_note": "Federal one-party baseline applies. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without notifying other parties. This is frequently misunderstood \u2014 New York does not require all-party consent."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "S06695 pending as of 2026 \u2014 coercive control criminal statute under consideration. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "NC",
+      "name": "North Carolina",
+      "recording": {
+        "tier": "one-party",
+        "statute": "N.C. Gen. Stat. \u00a7 15A-287",
+        "scope_note": "Participant recording lawful. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs interstate calls. Consult stricter law for all-party states.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in North Carolina statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "ND",
+      "name": "North Dakota",
+      "recording": {
+        "tier": "one-party",
+        "statute": "N.D. Cent. Code \u00a7 12.1-15-02",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording lawful.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter state law for all-party states.",
+        "practical": "You can record conversations you are a party to without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in North Dakota statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "OH",
+      "name": "Ohio",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Ohio Rev. Code Ann. \u00a7 2933.52",
+        "scope_note": "Participant recording permitted. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Ohio statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "OK",
+      "name": "Oklahoma",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Okla. Stat. tit. 13, \u00a7 176.4",
+        "scope_note": "One-party consent. Participant recording lawful.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter law for all-party states.",
+        "practical": "You can record without disclosure. Preserve recordings securely."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Oklahoma statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "OR",
+      "name": "Oregon",
+      "recording": {
+        "tier": "one-party",
+        "statute": "ORS \u00a7 165.540",
+        "scope_note": "Split regime: phone/electronic communications \u2014 one-party consent. In-person conversations \u2014 all-party notice required before recording. January 2025 Ninth Circuit en banc upheld the in-person notice requirement.",
+        "interstate_note": "Apply one-party standard for phone calls. Apply all-party notice for in-person conversations.",
+        "practical": "For phone calls: you can record without disclosure. For in-person conversations: you must notify all parties before recording begins."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Oregon statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "PA",
+      "name": "Pennsylvania",
+      "recording": {
+        "tier": "all-party",
+        "statute": "18 Pa. Cons. Stat. \u00a7\u00a7 5703, 5704",
+        "scope_note": "Third-degree felony (up to 7 years, $15,000 fine). Courts have consistently held that participant recording violates the statute. One of the harshest penalties in the US.",
+        "interstate_note": "Pennsylvania courts assert jurisdiction when any party is in PA. Apply all-party rule for interstate calls.",
+        "practical": "Must notify all parties before recording. Violation is a third-degree felony with significant prison and fine exposure. Do not record without express consent."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Pennsylvania statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "RI",
+      "name": "Rhode Island",
+      "recording": {
+        "tier": "one-party",
+        "statute": "R.I. Gen. Laws \u00a7 11-35-21",
+        "scope_note": "Participant recording permitted. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs interstate calls. Consult stricter law for all-party states.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Rhode Island statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "SC",
+      "name": "South Carolina",
+      "recording": {
+        "tier": "one-party",
+        "statute": "S.C. Code Ann. \u00a7 17-30-20",
+        "scope_note": "One-party consent. Participant recording lawful.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter state law for all-party states.",
+        "practical": "You can record without disclosure. Keep originals preserved."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "HB 588 pending as of 2026 \u2014 coercive control statute under consideration. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "SD",
+      "name": "South Dakota",
+      "recording": {
+        "tier": "one-party",
+        "statute": "S.D. Codified Laws \u00a7 23A-35A-20",
+        "scope_note": "Mirrors federal one-party baseline. Participant recording lawful.",
+        "interstate_note": "Federal law governs. Consult stricter state law for interstate calls.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in South Dakota statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "TN",
+      "name": "Tennessee",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Tenn. Code Ann. \u00a7 39-13-601",
+        "scope_note": "Participant recording permitted. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter law for all-party states.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Tennessee statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "TX",
+      "name": "Texas",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Tex. Penal Code \u00a7 16.02",
+        "scope_note": "Participant recording lawful. One-party consent under the wiretapping statute.",
+        "interstate_note": "Federal one-party baseline applies. Consult stricter law if calling into an all-party state.",
+        "practical": "You can record conversations you are part of without notifying others."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Texas statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "UT",
+      "name": "Utah",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Utah Code Ann. \u00a7 77-23a-4",
+        "scope_note": "Participant recording lawful. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter law for interstate calls into all-party states.",
+        "practical": "You can record without disclosure. Preserve recordings securely."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Utah statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "VT",
+      "name": "Vermont",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Vt. Stat. Ann. tit. 13, \u00a7 4601 et seq.",
+        "scope_note": "No specific Vermont statute covering participant recording; federal one-party baseline (18 U.S.C. \u00a7 2511) governs. Effectively one-party.",
+        "interstate_note": "Federal law applies. Consult stricter state law if calling into an all-party state.",
+        "practical": "You can record without notifying other parties. Vermont relies on federal law."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "15 V.S.A. \u00a7 1101",
+        "year": 2024,
+        "scope_note": "Coercive control defined and included in Vermont domestic violence statute as of 2024. Basis for civil protective order."
+      }
+    },
+    {
+      "abbr": "VA",
+      "name": "Virginia",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Va. Code Ann. \u00a7 19.2-62",
+        "scope_note": "Participant recording lawful. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter law for interstate calls into all-party states.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "Coercive control legislation pending as of 2026. Monitor for enactment."
+      }
+    },
+    {
+      "abbr": "WA",
+      "name": "Washington",
+      "recording": {
+        "tier": "all-party",
+        "statute": "RCW \u00a7 9.73.030",
+        "scope_note": "Emergency exception: threats of bodily harm may be recorded without consent (\u00a7 9.73.030(2)(b)). Otherwise all-party notice required. Notification must be captured on the recording itself.",
+        "interstate_note": "Washington asserts jurisdiction when any party is in WA. Apply all-party rule for interstate calls.",
+        "practical": "For threats or safety emergencies: one-party recording is lawful. For all other conversations: notify all parties before recording, and ensure the notification appears on the recording."
+      },
+      "coercive_control": {
+        "status": "civil",
+        "statute": "RCW \u00a7 7.105.010",
+        "year": 2022,
+        "scope_note": "Coercive control defined in the Domestic Violence Prevention Act as of 2022. Basis for protective order."
+      }
+    },
+    {
+      "abbr": "WV",
+      "name": "West Virginia",
+      "recording": {
+        "tier": "one-party",
+        "statute": "W. Va. Code \u00a7 62-1D-3",
+        "scope_note": "Participant recording permitted. One-party consent.",
+        "interstate_note": "Federal one-party baseline governs. Consult stricter law for all-party states.",
+        "practical": "You can record without disclosure."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in West Virginia statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "WI",
+      "name": "Wisconsin",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Wis. Stat. \u00a7 968.31",
+        "scope_note": "Participant recording lawful. One-party consent.",
+        "interstate_note": "Federal law governs interstate calls. Consult stricter state law for all-party states.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Wisconsin statutes as of 2026-05-22."
+      }
+    },
+    {
+      "abbr": "WY",
+      "name": "Wyoming",
+      "recording": {
+        "tier": "one-party",
+        "statute": "Wyo. Stat. Ann. \u00a7 7-3-702",
+        "scope_note": "Participant recording lawful. One-party consent.",
+        "interstate_note": "Federal law governs. Consult stricter state law for interstate calls.",
+        "practical": "You can record without notifying other parties."
+      },
+      "coercive_control": {
+        "status": "none",
+        "statute": null,
+        "year": null,
+        "scope_note": "No coercive control provision in Wyoming statutes as of 2026-05-22."
+      }
+    }
+  ],
+  "resources": [
+    {
+      "id": "ndvh",
+      "org": "National DV Hotline",
+      "type": "crisis",
+      "scope": "national",
+      "contact": "1-800-799-7233",
+      "url": "thehotline.org",
+      "note": "24/7 crisis support, safety planning, local referrals"
+    },
+    {
+      "id": "ctl",
+      "org": "Crisis Text Line",
+      "type": "crisis",
+      "scope": "national",
+      "contact": "Text HOME to 741741",
+      "url": "crisistextline.org",
+      "note": "24/7 text-based crisis counseling"
+    },
+    {
+      "id": "nnedv",
+      "org": "NNEDV Safety Net",
+      "type": "digital-safety",
+      "scope": "national",
+      "contact": "techsafety.org",
+      "url": "techsafety.org",
+      "note": "Technology safety resources for DV survivors"
+    },
+    {
+      "id": "cas",
+      "org": "Coalition Against Stalkerware",
+      "type": "digital-safety",
+      "scope": "national",
+      "contact": "stopstalkerware.org",
+      "url": "stopstalkerware.org",
+      "note": "Stalkerware detection guides and victim resources"
+    },
+    {
+      "id": "eff",
+      "org": "EFF Surveillance Self-Defense",
+      "type": "digital-safety",
+      "scope": "national",
+      "contact": "ssd.eff.org",
+      "url": "ssd.eff.org",
+      "note": "Practical guides: account hardening, device security, encrypted communications"
+    },
+    {
+      "id": "aba",
+      "org": "ABA Free Legal Answers",
+      "type": "legal",
+      "scope": "national",
+      "contact": "abafreelegalanswers.org",
+      "url": "abafreelegalanswers.org",
+      "note": "Free civil legal advice from volunteer attorneys"
+    },
+    {
+      "id": "womenslaw",
+      "org": "WomensLaw.org",
+      "type": "legal",
+      "scope": "national",
+      "contact": "womenslaw.org",
+      "url": "womenslaw.org",
+      "note": "Plain-language legal information by state for DV survivors"
+    },
+    {
+      "id": "docusafe",
+      "org": "DocuSafe",
+      "type": "documentation",
+      "scope": "national",
+      "contact": "myDocuSafe.com",
+      "url": "myDocuSafe.com",
+      "note": "Secure app for documenting and storing evidence of abuse"
+    },
+    {
+      "id": "openpath",
+      "org": "Open Path Collective",
+      "type": "therapy",
+      "scope": "national",
+      "contact": "openpathcollective.org",
+      "url": "openpathcollective.org",
+      "note": "Reduced-cost therapy ($30\u201380/session) with trauma-informed providers"
+    }
+  ],
+  "checklist": {
+    "dimensions": [
+      {
+        "id": "coercive-control",
+        "label": "Coercive Control Behaviors",
+        "items": [
+          {
+            "id": "cc-01",
+            "text": "Monitors your location, calls, or messages without your knowledge or consent"
+          },
+          {
+            "id": "cc-02",
+            "text": "Controls or limits your access to money, credit cards, or financial accounts"
+          },
+          {
+            "id": "cc-03",
+            "text": "Enforces rules about your appearance, movements, relationships, or speech"
+          },
+          {
+            "id": "cc-04",
+            "text": "Isolates you from friends, family, or support systems"
+          },
+          {
+            "id": "cc-05",
+            "text": "Uses children, pets, or shared assets as leverage or threats"
+          },
+          {
+            "id": "cc-06",
+            "text": "Threatens negative consequences if you do not comply with their demands"
+          }
+        ],
+        "result": {
+          "pattern": "Coercive Control",
+          "description": "A pattern of behavior designed to dominate, isolate, and control \u2014 often without physical violence. Recognized as a form of domestic abuse in several jurisdictions and increasingly named in law.",
+          "resources": [
+            "ndvh",
+            "womenslaw"
+          ]
+        }
+      },
+      {
+        "id": "psychological",
+        "label": "Psychological & Emotional Patterns",
+        "items": [
+          {
+            "id": "ps-01",
+            "text": "Denies events you know happened, or insists your memory or perception is wrong (gaslighting)"
+          },
+          {
+            "id": "ps-02",
+            "text": "Blames you for their abusive behavior, or portrays themselves as the victim (DARVO)"
+          },
+          {
+            "id": "ps-03",
+            "text": "Alternates between intense affection and sudden withdrawal or punishment"
+          },
+          {
+            "id": "ps-04",
+            "text": "Recruits friends, family, or colleagues to pressure, surveil, or discredit you (flying monkeys)"
+          },
+          {
+            "id": "ps-05",
+            "text": "Consistently reframes your reality, making you question your own judgment"
+          },
+          {
+            "id": "ps-06",
+            "text": "Pursues re-engagement after periods of abandonment using promises, threats, or manufactured crises (hoovering)"
+          }
+        ],
+        "result": {
+          "pattern": "Psychological Abuse",
+          "description": "Systematic distortion of reality and emotional manipulation that erodes self-trust over time. These patterns can be as damaging as physical abuse and are often more difficult to name and document.",
+          "resources": [
+            "ndvh",
+            "openpath"
+          ]
+        }
+      },
+      {
+        "id": "digital-abuse",
+        "label": "Digital & Technology Abuse",
+        "items": [
+          {
+            "id": "da-01",
+            "text": "Has demanded or taken access to your device, accounts, email, or passwords"
+          },
+          {
+            "id": "da-02",
+            "text": "You suspect monitoring software (stalkerware) has been installed on your device"
+          },
+          {
+            "id": "da-03",
+            "text": "Uses shared family plans, location sharing, or cloud accounts to track your location or activity"
+          },
+          {
+            "id": "da-04",
+            "text": "Contacts or harasses you across multiple platforms after you have blocked them on one"
+          },
+          {
+            "id": "da-05",
+            "text": "Has posted, threatened to post, or controls private images or recordings of you"
+          },
+          {
+            "id": "da-06",
+            "text": "Deletes messages or alters accounts to interfere with your ability to document what happened"
+          }
+        ],
+        "result": {
+          "pattern": "Technology-Facilitated Abuse",
+          "description": "Modern abusers use technology as a control vector \u2014 surveillance, harassment, and evidence interference can all occur digitally. These tactics often run in parallel with other forms of abuse and leave their own documentation trail.",
+          "resources": [
+            "nnedv",
+            "cas",
+            "eff"
+          ]
+        }
+      }
+    ]
+  }
+}
