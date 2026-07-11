@@ -2,7 +2,7 @@ name: Render and Deploy Dashboard
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # 06:00 UTC = 01:00 CDT nightly
+    #- cron: "0 6 * * *"   # 06:00 UTC = 01:00 CDT nightly
   push:
     branches: [main]
   workflow_dispatch:       # allow manual trigger
